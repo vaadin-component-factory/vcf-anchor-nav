@@ -12,10 +12,12 @@ import { ElementMixin } from '@vaadin/vaadin-element-mixin';
 import '@vaadin/vaadin-license-checker/vaadin-license-checker';
 
 /**
- * `<vcf-element>` --elementdescription--
+ * `<vcf-anchor-nav>`
+ * Component with tabs used as anchor navigation and content sections.
+ * Automates the linking of tabs and sections.
  *
  * ```html
- * <vcf-element></vcf-element>
+ * <vcf-anchor-nav></vcf-anchor-nav>
  * ```
  *
  * ### Styling
@@ -24,7 +26,7 @@ import '@vaadin/vaadin-license-checker/vaadin-license-checker';
  *
  * Custom property | Description | Default
  * ----------------|-------------|-------------
- * `--vcf-element-property` | Example custom property | `unset`
+ * `--vcf-anchor-nav-property` | Example custom property | `unset`
  *
  * The following shadow DOM parts are available for styling:
  *
@@ -43,7 +45,7 @@ import '@vaadin/vaadin-license-checker/vaadin-license-checker';
  * @mixes ThemableMixin
  * @demo demo/index.html
  */
-class VcfElement extends ElementMixin(ThemableMixin(PolymerElement)) {
+class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   static get template() {
     return html`
       <style>
@@ -55,7 +57,7 @@ class VcfElement extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   static get is() {
-    return 'vcf-element';
+    return 'vcf-anchor-nav';
   }
 
   static get version() {
@@ -75,14 +77,14 @@ class VcfElement extends ElementMixin(ThemableMixin(PolymerElement)) {
     const devModeCallback = window.Vaadin.developmentModeCallback;
     const licenseChecker = devModeCallback && devModeCallback['vaadin-license-checker'];
     if (typeof licenseChecker === 'function') {
-      licenseChecker(VcfElement);
+      licenseChecker(VcfAnchorNav);
     }
   }
 }
 
-customElements.define(VcfElement.is, VcfElement);
+customElements.define(VcfAnchorNav.is, VcfAnchorNav);
 
 /**
  * @namespace Vaadin
  */
-window.Vaadin.VcfElement = VcfElement;
+window.Vaadin.VcfAnchorNav = VcfAnchorNav;

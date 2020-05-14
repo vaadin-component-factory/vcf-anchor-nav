@@ -1,25 +1,21 @@
-# &lt;vcf-element&gt;
-
-**Note that this is a starter boilerplate for creating Polymer 3 based components.**
-
-**Run `npm install` and follow the prompts to setup the workspace.**
+# &lt;vcf-anchor-nav&gt;
 
 <!--
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/vaadin/web-components?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![npm version](https://badgen.net/npm/v/@vaadin-component-factory/vcf-element)](https://www.npmjs.com/package/@vaadin-component-factory/vcf-element)
-[![Published on Vaadin Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/vaadin-component-factoryvcf-element)
+[![npm version](https://badgen.net/npm/v/@vaadin-component-factory/vcf-anchor-nav)](https://www.npmjs.com/package/@vaadin-component-factory/vcf-anchor-nav)
+[![Published on Vaadin Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/vaadin-component-factoryvcf-anchor-nav)
 
-[Live demo ↗](https://vcf-element.netlify.com)
+[Live demo ↗](https://vcf-anchor-nav.netlify.com)
 |
-[API documentation ↗](https://vcf-element.netlify.com/api/#/elements/Vaadin.VcfElement)
+[API documentation ↗](https://vcf-anchor-nav.netlify.com/api/#/elements/Vaadin.VcfAnchorNav)
 -->
 
 ## Installation
 
-Install `vcf-element`:
+Install `vcf-anchor-nav`:
 
 ```sh
-npm i @vaadin-component-factory/vcf-element --save
+npm i @vaadin-component-factory/vcf-anchor-nav --save
 ```
 
 ## Usage
@@ -27,22 +23,22 @@ npm i @vaadin-component-factory/vcf-element --save
 Once installed, import it in your application:
 
 ```js
-import '@vaadin-component-factory/vcf-element';
+import '@vaadin-component-factory/vcf-anchor-nav';
 ```
 
-Add `<vcf-element>` element to the page.
+Add `<vcf-anchor-nav>` element to the page.
 
 ```html
-<vcf-element></vcf-element>
+<vcf-anchor-nav></vcf-anchor-nav>
 ```
 
 ## Running demo
 
-1. Fork the `vcf-element` repository and clone it locally.
+1. Fork the `vcf-anchor-nav` repository and clone it locally.
 
 1. Make sure you have [npm](https://www.npmjs.com/) installed.
 
-1. When in the `vcf-element` directory, run `npm install` to install dependencies.
+1. When in the `vcf-anchor-nav` directory, run `npm install` to install dependencies.
 
 1. Run `npm start` to open the demo.
 
