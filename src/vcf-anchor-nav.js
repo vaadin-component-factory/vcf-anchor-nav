@@ -69,7 +69,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   static get version() {
-    return '0.1.0';
+    return '0.1.1';
   }
 
   static get properties() {
