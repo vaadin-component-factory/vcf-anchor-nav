@@ -18,6 +18,12 @@
         main.hidden {
           opacity: 0;
         }
+        code {
+          display: inline-block;
+          background-color: var(--lumo-shade-10pct);
+          padding: 2px 5px;
+          border-radius: 5px;
+        }
       </style>
     </custom-style>
     <script>
@@ -27,10 +33,18 @@
   <body>
     <main class="vertical-section-container centered hidden">
       <h4><a href="api/#/elements/Vaadin.VcfAnchorNav">API documentation ↗</a></h4>
-      <h3>Basic</h3>
+      <h3>Basic Example</h3>
       <demo-snippet>
         <template>
-          <vcf-anchor-nav></vcf-anchor-nav>
+          <vcf-anchor-nav style="height: 50vh; overflow: auto;">
+            <vcf-anchor-nav-section name="First"></vcf-anchor-nav-section>
+            <vcf-anchor-nav-section style="height: 20vh;"></vcf-anchor-nav-section>
+            <vcf-anchor-nav-section>
+              <h1 slot="header">Custom Header</h1>
+            </vcf-anchor-nav-section>
+            <vcf-anchor-nav-section style="height: 120vh;"></vcf-anchor-nav-section>
+            <vcf-anchor-nav-section></vcf-anchor-nav-section>
+          </vcf-anchor-nav>
         </template>
       </demo-snippet>
     </main>
