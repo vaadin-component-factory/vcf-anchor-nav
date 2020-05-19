@@ -145,10 +145,14 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       this._initTabHighlight();
       // Hack to fix initial scroll on Firefox
       setTimeout(() => {
-        // Scroll to URL hash if possible
+        // Scroll to and select section in URL hash if possible
         if (location.hash) {
           const section = this.querySelector(location.hash);
-          if (section) this.scrollTo({ top: section.offsetTop - this.$.tabs.clientHeight });
+          if (section) {
+            this.scrollTo({ top: section.offsetTop - this.$.tabs.clientHeight });
+            this._clearSelection();
+            this._setNavItemSelected(location.hash.replace('#', ''), true);
+          }
         }
       });
     }
