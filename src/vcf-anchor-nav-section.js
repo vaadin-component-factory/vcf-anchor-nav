@@ -32,6 +32,7 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
       /**
        * Used to set corresponding tab label and default header text.
        * If not set defaults to "Section <index>".
+       * @type {String}
        */
       name: {
         type: String

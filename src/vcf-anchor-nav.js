@@ -32,6 +32,7 @@ import '@vaadin/vaadin-tabs/vaadin-tab';
  * Part name | Description
  * ----------------|----------------
  * `tabs` | Container for navigation tabs.
+ * `header` | Header section above tabs.
  *
  * @memberof Vaadin
  * @mixes ElementMixin
@@ -45,7 +46,6 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         :host {
           display: block;
           overflow: auto;
-          scroll-behavior: smooth;
           position: relative;
         }
 
@@ -53,12 +53,17 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           background: var(--lumo-shade-5pct);
         }
 
+        ::slotted([slot='header']) {
+          padding: 0 var(--lumo-space-m);
+        }
+
         #tabs {
           position: sticky;
-          top: 0;
+          top: -1px;
           background: var(--lumo-base-color);
         }
       </style>
+      <slot name="header" part="header"></slot>
       <vaadin-tabs id="tabs" part="tabs"></vaadin-tabs>
       <slot id="slot"></slot>
     `;
@@ -69,18 +74,26 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   static get version() {
-    return '0.1.1';
+    return '0.1.2';
   }
 
   static get properties() {
     return {
       /**
        * Index of selected section.
+       * @type {Number}
+       * @readonly
        */
-      selected: {
+      selectedIndex: {
         type: Number,
-        value: 0
-      }
+        value: 0,
+        observer: '_selectedChanged'
+      },
+      /**
+       * Id of selected section.
+       * @type {String}
+       */
+      selectedId: String
     };
   }
 
@@ -113,7 +126,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         tab.id = `${section.id}-tab`;
         tab.appendChild(a);
         tab.addEventListener('click', () => {
-          this.selected = i;
+          this.selectedIndex = i;
           this.scrollTo({
             top: section.offsetTop - this.$.tabs.clientHeight,
             behavior: 'smooth'
@@ -123,6 +136,11 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         this.$.tabs.appendChild(tab);
       });
       this._initTabHighlight();
+      // Scroll to URL hash if possible
+      if (location.hash) {
+        const section = this.querySelector(location.hash);
+        if (section) this.scrollTo({ top: section.offsetTop - this.$.tabs.clientHeight });
+      }
     }
   }
 
@@ -131,7 +149,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       this._clearSelection();
       const firstIntersecting = entries.filter(entry => entry.isIntersecting)[0];
       if (firstIntersecting) this._setNavItemSelected(firstIntersecting.target.id, true);
-      else this._setNavItemSelected(this.sections[this.selected].id, true);
+      else this._setNavItemSelected(this.sections[this.selectedIndex].id, true);
     };
     this.sections.forEach(element => {
       const height = this.clientHeight - this.$.tabs.clientHeight;
@@ -152,7 +170,10 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     const navItem = this.$.tabs.querySelector(`#${sectionId}-tab`);
     if (navItem) {
       navItem.selected = value;
-      if (navItem.selected) this.selected = this._getNodeIndex(navItem);
+      if (navItem.selected) {
+        this.sectionId = sectionId;
+        this.selectedIndex = this._getNodeIndex(navItem);
+      }
     }
   }
 
@@ -160,6 +181,17 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     let i = 0;
     while ((element = element.previousSibling) !== null) i++;
     return i;
+  }
+
+  _selectedChanged(selectedIndex) {
+    this.dispatchEvent(
+      new CustomEvent('selected-changed', {
+        detail: {
+          index: selectedIndex,
+          id: this.selectedId
+        }
+      })
+    );
   }
 
   /**
@@ -173,6 +205,15 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       licenseChecker(VcfAnchorNav);
     }
   }
+
+  /**
+   * Fired when the selected tab is changed.
+   *
+   * @event selected-changed
+   * @param {Object} detail
+   * @param {Object} detail.id Id of selected section.
+   * @param {Object} detail.index Index of selected section.
+   */
 }
 
 customElements.define(VcfAnchorNav.is, VcfAnchorNav);
