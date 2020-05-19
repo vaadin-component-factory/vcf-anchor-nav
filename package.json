@@ -1,6 +1,6 @@
 {
   "name": "@vaadin-component-factory/vcf-anchor-nav",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Component with tabs used as anchor navigation and content sections. Automates the linking of tabs and sections.",
   "main": "theme/lumo/vcf-anchor-nav.js",
   "author": "Vaadin Ltd",
