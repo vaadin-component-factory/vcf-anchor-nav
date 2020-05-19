@@ -44,9 +44,15 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     return html`
       <style>
         :host {
-          display: block;
+          display: flex;
+          flex-direction: column;
+          width: 100%;
           overflow: auto;
           position: relative;
+        }
+
+        ::slotted(*) {
+          flex: 0 0 auto;
         }
 
         ::slotted(vcf-anchor-nav-section:nth-child(odd)) {
@@ -61,6 +67,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           position: sticky;
           top: -1px;
           background: var(--lumo-base-color);
+          z-index: 1;
         }
       </style>
       <slot name="header" part="header"></slot>
@@ -192,6 +199,15 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         }
       })
     );
+    // Horizontal scroll tabs when selected changes
+    if (this.$.tabs.hasAttribute('overflow') && this.sections.length) {
+      const topOffset = this.sections[0].offsetTop;
+      const scrollRatio = (this.sections[selectedIndex].offsetTop - topOffset) / (this.scrollHeight - topOffset);
+      this.$.tabs.$.scroll.scrollTo({
+        left: this.$.tabs.$.scroll.scrollWidth * scrollRatio,
+        behavior: 'smooth'
+      });
+    }
   }
 
   /**
