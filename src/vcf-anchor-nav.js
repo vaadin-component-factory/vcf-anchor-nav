@@ -143,11 +143,14 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         this.$.tabs.appendChild(tab);
       });
       this._initTabHighlight();
-      // Scroll to URL hash if possible
-      if (location.hash) {
-        const section = this.querySelector(location.hash);
-        if (section) this.scrollTo({ top: section.offsetTop - this.$.tabs.clientHeight });
-      }
+      // Hack to fix initial scroll on Firefox
+      setTimeout(() => {
+        // Scroll to URL hash if possible
+        if (location.hash) {
+          const section = this.querySelector(location.hash);
+          if (section) this.scrollTo({ top: section.offsetTop - this.$.tabs.clientHeight });
+        }
+      });
     }
   }
 
@@ -159,10 +162,14 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       else this._setNavItemSelected(this.sections[this.selectedIndex].id, true);
     };
     this.sections.forEach(element => {
+      // This factor value can be adjusted however
+      // Below 0.7 in Firefox the highlighting is inconsistent
+      // Above 0.9 all browsers may not work correctly
+      const factor = 0.75;
       const height = this.clientHeight - this.$.tabs.clientHeight;
       const options = {
         root: this,
-        threshold: element.clientHeight > height ? (height / element.clientHeight) * 0.6 : 1
+        threshold: element.clientHeight > height ? (height / element.clientHeight) * factor : 1
       };
       const observer = new IntersectionObserver(callback, options);
       observer.observe(element);
