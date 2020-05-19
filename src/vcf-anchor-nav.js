@@ -201,10 +201,12 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     );
     // Horizontal scroll tabs when selected changes
     if (this.$.tabs.hasAttribute('overflow') && this.sections.length) {
+      const leftOffset = this.$.tabs.root.querySelector('[part="back-button"]').clientWidth * 2;
       const topOffset = this.sections[0].offsetTop;
       const scrollRatio = (this.sections[selectedIndex].offsetTop - topOffset) / (this.scrollHeight - topOffset);
+      const left = this.$.tabs.$.scroll.scrollWidth * scrollRatio;
       this.$.tabs.$.scroll.scrollTo({
-        left: this.$.tabs.$.scroll.scrollWidth * scrollRatio,
+        left: left && left - leftOffset,
         behavior: 'smooth'
       });
     }
