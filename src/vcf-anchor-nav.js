@@ -27,12 +27,21 @@ import '@vaadin/vaadin-tabs/vaadin-tab';
  * </vcf-anchor-nav>
  * ```
  *
+ * ### Styling
+ *
+ * The following custom properties are available for styling:
+ *
+ * Custom property | Description | Default
+ * ----------------|-------------|-------------
+ * `--_anchor-nav-inner-max-width` | Max-width of the inner container | `auto`
+ *
  * The following shadow DOM parts are available for styling:
  *
  * Part name | Description
  * ----------------|----------------
- * `tabs` | Container for navigation tabs.
- * `header` | Header section above tabs.
+ * `container` | Main container for header, tabs and sections.
+ * `header` | Wrapper for header slot above tabs.
+ * `tabs` | Internal `vaadin-tabs` used for navigation.
  *
  * @memberof Vaadin
  * @mixes ElementMixin
@@ -44,35 +53,53 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     return html`
       <style>
         :host {
+          display: block;
+          overflow: auto;
+          position: relative;
+          --_anchor-nav-inner-max-width: auto;
+        }
+
+        :host([theme~='fullscreen']) {
+          height: 100vh;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          right: 0;
+          left: 0;
+        }
+
+        [part='container'] {
           display: flex;
           flex-direction: column;
           width: 100%;
-          overflow: auto;
-          position: relative;
+          max-width: var(--_anchor-nav-inner-max-width);
+          margin: auto;
+        }
+
+        [part='tabs'] {
+          position: sticky;
+          top: -1px;
+          background: var(--lumo-base-color);
+          z-index: 1;
         }
 
         ::slotted(*) {
           flex: 0 0 auto;
         }
 
-        ::slotted(vcf-anchor-nav-section:nth-child(odd)) {
+        ::slotted(vcf-anchor-nav-section:nth-child(even)) {
           background: var(--lumo-shade-5pct);
         }
 
         ::slotted([slot='header']) {
           padding: 0 var(--lumo-space-m);
         }
-
-        #tabs {
-          position: sticky;
-          top: -1px;
-          background: var(--lumo-base-color);
-          z-index: 1;
-        }
       </style>
-      <slot name="header" part="header"></slot>
-      <vaadin-tabs id="tabs" part="tabs"></vaadin-tabs>
-      <slot id="slot"></slot>
+      <div part="container">
+        <div part="header"><slot name="header"></slot></div>
+        <vaadin-tabs id="tabs" part="tabs"></vaadin-tabs>
+        <slot id="slot"></slot>
+      </div>
     `;
   }
 
@@ -100,7 +127,17 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
        * Id of selected section.
        * @type {String}
        */
-      selectedId: String
+      selectedId: String,
+      /**
+       * Component theme presets.
+       *
+       * - _fullscreen_: Component fills the entire screen.
+       * @type {String}
+       */
+      theme: {
+        type: String,
+        reflectToAttribute: true
+      }
     };
   }
 
@@ -125,7 +162,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         const tab = document.createElement('vaadin-tab');
         const a = document.createElement('a');
         section.name = section.name || `Section ${i + 1}`;
-        section.id = section.id || section.name.replace(' ', '-').toLowerCase();
+        section.id = section.id || section.name.replace(/ /g, '-').toLowerCase();
         a.innerText = section.name;
         a.id = `${section.id}-anchor`;
         a.href = `#${section.id}`;
@@ -160,24 +197,40 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
 
   _initTabHighlight() {
     const callback = (entries, _) => {
-      this._clearSelection();
-      const firstIntersecting = entries.filter(entry => entry.isIntersecting)[0];
-      if (firstIntersecting) this._setNavItemSelected(firstIntersecting.target.id, true);
-      else this._setNavItemSelected(this.sections[this.selectedIndex].id, true);
+      const lastEntry = entries[entries.length - 1];
+      lastEntry.target.isIntersecting = lastEntry.isIntersecting && lastEntry.intersectionRatio >= this._thresholds[lastEntry.target.id];
+      this._updateSelected();
     };
+    this._thresholds = {};
     this.sections.forEach(element => {
-      // This factor value can be adjusted however
-      // Below 0.7 in Firefox the highlighting is inconsistent
-      // Above 0.9 all browsers may not work correctly
-      const factor = 0.75;
-      const height = this.clientHeight - this.$.tabs.clientHeight;
       const options = {
         root: this,
-        threshold: element.clientHeight > height ? (height / element.clientHeight) * factor : 1
+        threshold: this._getThreshold(element.clientHeight)
       };
+      // Store thresholds for debugging purposes
+      this._thresholds[element.id] = options.threshold;
       const observer = new IntersectionObserver(callback, options);
       observer.observe(element);
     });
+  }
+
+  _updateSelected() {
+    clearTimeout(this._updateSelectedTimeout);
+    this._updateSelectedTimeout = setTimeout(() => {
+      this._clearSelection();
+      const firstIntersecting = this.sections.filter(i => i.isIntersecting)[0];
+      if (firstIntersecting) this._setNavItemSelected(firstIntersecting.id, true);
+      else this._setNavItemSelected(this.sections[this.selectedIndex].id, true);
+    });
+  }
+
+  _getThreshold(sectionHeight) {
+    // This factor value can be adjusted however
+    // Below 0.7 in Firefox the highlighting is inconsistent
+    // Above 0.9 all browsers may not work correctly
+    const factor = 0.75;
+    const height = this.clientHeight - this.$.tabs.clientHeight;
+    return sectionHeight > height ? (height / sectionHeight) * factor : 1;
   }
 
   _clearSelection() {
