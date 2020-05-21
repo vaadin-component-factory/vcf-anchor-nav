@@ -8,82 +8,119 @@
     <script dev type="module" src="demo.js"></script>
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
-        .centered {
-          max-width: 990px;
+        body {
+          background-color: var(--lumo-base-color);
+          padding: 0;
         }
-        main {
+        h1 {
+          padding: 0 0 var(--lumo-space-l) var(--lumo-space-m);
+        }
+        h2 {
+          padding: var(--lumo-space-l) 0 var(--lumo-space-l) var(--lumo-space-m);
+        }
+        vcf-anchor-nav.main {
           opacity: 1;
           transition: opacity 0.5s;
+          --_anchor-nav-inner-max-width: 1000px;
         }
-        main.hidden {
+        vcf-anchor-nav.main::part(tabs) {
+          box-shadow: inset 0 -1px 0 0 var(--lumo-contrast-20pct);
+          z-index: 2;
+        }
+        vcf-anchor-nav.main > vcf-anchor-nav-section {
+          height: auto;
+          background-color: var(--lumo-base-color);
+        }
+        vcf-anchor-nav.fullscreen[fullscreen] {
+          z-index: 3;
+        }
+        #api vaadin-button {
+          cursor: pointer;
+        }
+        .hidden {
           opacity: 0;
         }
-        code {
-          display: inline-block;
-          background-color: var(--lumo-shade-10pct);
-          padding: 2px 5px;
-          border-radius: 5px;
+        .centered {
+          max-width: 1000px;
+        }
+        .nav {
+          margin: var(--lumo-space-l) var(--lumo-space-m) var(--lumo-space-l) calc(var(--lumo-button-size) * -1 / 6);
         }
       </style>
     </custom-style>
     <script>
-      window.addEventListener('WebComponentsReady', () => document.querySelector('main').classList.remove('hidden'));
+      window.addEventListener('WebComponentsReady', () => {
+        setTimeout(() => document.querySelector('body').style.removeProperty('overflow'));
+        document.querySelectorAll('.hidden').forEach(element => element.classList.remove('hidden'));
+      });
     </script>
   </head>
   <body>
-    <main class="vertical-section-container centered hidden">
-      <h4><a href="api/#/elements/Vaadin.VcfAnchorNav">API documentation ↗</a></h4>
-      <h2>Basic Example</h2>
-      <demo-snippet>
-        <template>
-          <vcf-anchor-nav style="height: 50vh;">
-            <h1 slot="header">Main Header</h1>
-            <vcf-anchor-nav-section name="First">Section 1</vcf-anchor-nav-section>
-            <vcf-anchor-nav-section style="height: 20vh;">Section 2</vcf-anchor-nav-section>
-            <vcf-anchor-nav-section>
-              <h1 slot="header">Custom Header</h1>
-              Section 3
-            </vcf-anchor-nav-section>
-            <vcf-anchor-nav-section style="height: 120vh;">Section 4</vcf-anchor-nav-section>
-            <vcf-anchor-nav-section>Section 5</vcf-anchor-nav-section>
-          </vcf-anchor-nav>
-        </template>
-      </demo-snippet>
+    <vcf-anchor-nav fullscreen class="main hidden">
+      <a id="api" slot="header" href="/api/#/elements/Vaadin.VcfAnchorNav">
+        <vaadin-button theme="tertiary" class="nav hidden">
+          <iron-icon icon="lumo:angle-right" slot="suffix"></iron-icon>
+          API
+        </vaadin-button>
+      </a>
 
-      <h2>Fullscreen</h2>
-      <demo-snippet>
-        <template>
-          <style>
-            vaadin-button {
-              margin: var(--lumo-space-l) var(--lumo-space-m);
-              font-size: var(--lumo-font-size-l);
-            }
-            vcf-anchor-nav#fullscreen {
-              --_anchor-nav-inner-max-width: 1000px;
-              --_anchor-nav-inner-background: var(--lumo-base-color);
-              --_anchor-nav-inner-padding: 0 0 20vh 0;
-            }
-          </style>
+      <h1 slot="header" class="hidden"><code>&lt;vcf-anchor-nav&gt;</code></h1>
 
-          <vcf-anchor-nav id="fullscreen" style="height: 50vh">
-            <vaadin-button slot="header">Toggle Fullscreen</vaadin-button>
-            <vcf-anchor-nav-section>Section 1</vcf-anchor-nav-section>
-            <vcf-anchor-nav-section>Section 2</vcf-anchor-nav-section>
-            <vcf-anchor-nav-section>Section 3</vcf-anchor-nav-section>
-          </vcf-anchor-nav>
+      <vcf-anchor-nav-section name="Basic">
+        <h2 slot="header" class="hidden">Basic</h2>
+        <demo-snippet>
+          <template>
+            <vcf-anchor-nav style="height: 50vh;">
+              <h1 slot="header">Main Header</h1>
+              <vcf-anchor-nav-section name="First">Section 1</vcf-anchor-nav-section>
+              <vcf-anchor-nav-section style="height: 20vh;">Section 2</vcf-anchor-nav-section>
+              <vcf-anchor-nav-section>
+                <h1 slot="header">Custom Header</h1>
+                Section 3
+              </vcf-anchor-nav-section>
+              <vcf-anchor-nav-section style="height: 120vh;">Section 4</vcf-anchor-nav-section>
+              <vcf-anchor-nav-section>Section 5</vcf-anchor-nav-section>
+            </vcf-anchor-nav>
+          </template>
+        </demo-snippet>
+      </vcf-anchor-nav-section>
 
-          <script>
-            window.addEventListener('WebComponentsReady', () => {
-              document.querySelector('vaadin-button').addEventListener('click', () => {
-                const anchorNav = document.querySelector('#fullscreen');
-                anchorNav.fullscreen = !anchorNav.fullscreen;
-                if (anchorNav.fullscreen) anchorNav.style.removeProperty('height');
-                else anchorNav.style.height = '50vh';
+      <vcf-anchor-nav-section name="Fullscreen">
+        <h2 slot="header" class="hidden">Fullscreen</h2>
+        <demo-snippet>
+          <template>
+            <style>
+              vaadin-button.fullscreen {
+                margin: var(--lumo-space-l) var(--lumo-space-m);
+                font-size: var(--lumo-font-size-l);
+              }
+              vcf-anchor-nav.fullscreen {
+                --_anchor-nav-inner-max-width: 1000px;
+                --_anchor-nav-inner-background: var(--lumo-base-color);
+                --_anchor-nav-inner-padding: 0;
+              }
+            </style>
+
+            <vcf-anchor-nav class="fullscreen" style="height: 50vh">
+              <vaadin-button class="fullscreen" slot="header">Toggle Fullscreen</vaadin-button>
+              <vcf-anchor-nav-section>Section 1</vcf-anchor-nav-section>
+              <vcf-anchor-nav-section>Section 2</vcf-anchor-nav-section>
+              <vcf-anchor-nav-section>Section 3</vcf-anchor-nav-section>
+            </vcf-anchor-nav>
+
+            <script>
+              window.addEventListener('WebComponentsReady', () => {
+                document.querySelector('vaadin-button.fullscreen').addEventListener('click', () => {
+                  const anchorNav = document.querySelector('vcf-anchor-nav.fullscreen');
+                  anchorNav.fullscreen = !anchorNav.fullscreen;
+                  if (anchorNav.fullscreen) anchorNav.style.removeProperty('height');
+                  else anchorNav.style.height = '50vh';
+                });
               });
-            });
-          </script>
-        </template>
-      </demo-snippet>
-    </main>
+            </script>
+          </template>
+        </demo-snippet>
+      </vcf-anchor-nav-section>
+    </vcf-anchor-nav>
   </body>
 </html>
