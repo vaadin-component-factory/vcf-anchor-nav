@@ -33,7 +33,9 @@ import '@vaadin/vaadin-tabs/vaadin-tab';
  *
  * Custom property | Description | Default
  * ----------------|-------------|-------------
- * `--_anchor-nav-inner-max-width` | Max-width of the inner container | `auto`
+ * `--_anchor-nav-inner-max-width` | `max-width` of inner container (`[part="container"]`) | `auto`
+ * `--_anchor-nav-inner-background` | `background` of inner container (`[part="container"]`) | `var(--lumo-base-color)` (`#ffffff`)
+ * `--_anchor-nav-inner-padding` | `padding` of inner container (`[part="container"]`) | `0 0 20vh 0`
  *
  * The following shadow DOM parts are available for styling:
  *
@@ -57,23 +59,29 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           overflow: auto;
           position: relative;
           --_anchor-nav-inner-max-width: auto;
+          --_anchor-nav-inner-background: var(--lumo-base-color);
+          --_anchor-nav-inner-padding: 0;
         }
 
-        :host([theme~='fullscreen']) {
+        :host([fullscreen]) {
           height: 100vh;
-          position: absolute;
+          position: fixed;
           top: 0;
           bottom: 0;
           right: 0;
           left: 0;
+          z-index: 1;
+          transition: all 0.2s;
         }
 
         [part='container'] {
           display: flex;
           flex-direction: column;
           width: 100%;
-          max-width: var(--_anchor-nav-inner-max-width);
           margin: auto;
+          max-width: var(--_anchor-nav-inner-max-width);
+          padding: var(--_anchor-nav-inner-padding);
+          background: var(--_anchor-nav-inner-background);
         }
 
         [part='tabs'] {
@@ -129,24 +137,31 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
        */
       selectedId: String,
       /**
-       * Component theme presets.
-       *
-       * - _fullscreen_: Component fills the entire screen.
+       * Component fills the entire screen.
        * @type {String}
        */
-      theme: {
-        type: String,
-        reflectToAttribute: true
+      fullscreen: {
+        type: Boolean,
+        reflectToAttribute: true,
+        observer: '_fullscreenChanged'
       }
     };
   }
 
   /**
-   * Returns an array of the section elements.
+   * Returns array of the section elements.
    * @returns {Array<VcfAnchorNavSection>}
    */
   get sections() {
     return this.$.slot.assignedNodes().filter(node => node.tagName === 'VCF-ANCHOR-NAV-SECTION');
+  }
+
+  /**
+   * Returns the last section.
+   * @returns {VcfAnchorNavSection}
+   */
+  get last() {
+    return this.sections[this.sections.length - 1];
   }
 
   ready() {
@@ -196,19 +211,17 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   _initTabHighlight() {
-    const callback = (entries, _) => {
+    const callback = (entries, observer) => {
       const lastEntry = entries[entries.length - 1];
-      lastEntry.target.isIntersecting = lastEntry.isIntersecting && lastEntry.intersectionRatio >= this._thresholds[lastEntry.target.id];
+      // Threshold comparison required for Firefox
+      lastEntry.target.isIntersecting = lastEntry.isIntersecting && lastEntry.intersectionRatio >= observer.thresholds[0];
       this._updateSelected();
     };
-    this._thresholds = {};
     this.sections.forEach(element => {
       const options = {
         root: this,
         threshold: this._getThreshold(element.clientHeight)
       };
-      // Store thresholds for debugging purposes
-      this._thresholds[element.id] = options.threshold;
       const observer = new IntersectionObserver(callback, options);
       observer.observe(element);
     });
@@ -273,6 +286,19 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         left: left && left - leftOffset,
         behavior: 'smooth'
       });
+    }
+  }
+
+  _fullscreenChanged(fullscreen) {
+    const body = document.querySelector('body');
+    if (fullscreen) {
+      const windowHeight = window.innerHeight - this.$.tabs.clientHeight;
+      const paddingBottom = this.last.clientHeight < windowHeight ? windowHeight - this.last.clientHeight : 0;
+      body.style.overflow = 'hidden';
+      this.style.setProperty('--_anchor-nav-inner-padding', `0 0 ${paddingBottom}px 0`);
+    } else {
+      body.style.removeProperty('overflow');
+      this.style.setProperty('--_anchor-nav-inner-padding', '0');
     }
   }
 

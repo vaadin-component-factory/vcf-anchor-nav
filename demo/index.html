@@ -9,7 +9,7 @@
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
         .centered {
-          max-width: 1000px;
+          max-width: 990px;
         }
         main {
           opacity: 1;
@@ -33,7 +33,7 @@
   <body>
     <main class="vertical-section-container centered hidden">
       <h4><a href="api/#/elements/Vaadin.VcfAnchorNav">API documentation ↗</a></h4>
-      <h3>Basic Example</h3>
+      <h2>Basic Example</h2>
       <demo-snippet>
         <template>
           <vcf-anchor-nav style="height: 50vh;">
@@ -47,6 +47,41 @@
             <vcf-anchor-nav-section style="height: 120vh;">Section 4</vcf-anchor-nav-section>
             <vcf-anchor-nav-section>Section 5</vcf-anchor-nav-section>
           </vcf-anchor-nav>
+        </template>
+      </demo-snippet>
+
+      <h2>Fullscreen</h2>
+      <demo-snippet>
+        <template>
+          <style>
+            vaadin-button {
+              margin: var(--lumo-space-l) var(--lumo-space-m);
+              font-size: var(--lumo-font-size-l);
+            }
+            vcf-anchor-nav#fullscreen {
+              --_anchor-nav-inner-max-width: 1000px;
+              --_anchor-nav-inner-background: var(--lumo-base-color);
+              --_anchor-nav-inner-padding: 0 0 20vh 0;
+            }
+          </style>
+
+          <vcf-anchor-nav id="fullscreen" style="height: 50vh">
+            <vaadin-button slot="header">Toggle Fullscreen</vaadin-button>
+            <vcf-anchor-nav-section>Section 1</vcf-anchor-nav-section>
+            <vcf-anchor-nav-section>Section 2</vcf-anchor-nav-section>
+            <vcf-anchor-nav-section>Section 3</vcf-anchor-nav-section>
+          </vcf-anchor-nav>
+
+          <script>
+            window.addEventListener('WebComponentsReady', () => {
+              document.querySelector('vaadin-button').addEventListener('click', () => {
+                const anchorNav = document.querySelector('#fullscreen');
+                anchorNav.fullscreen = !anchorNav.fullscreen;
+                if (anchorNav.fullscreen) anchorNav.style.removeProperty('height');
+                else anchorNav.style.height = '50vh';
+              });
+            });
+          </script>
         </template>
       </demo-snippet>
     </main>
