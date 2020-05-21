@@ -145,7 +145,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       selectedIndex: {
         type: Number,
         value: 0,
-        observer: '_selectedChanged'
+        observer: '_selectedIndexChanged'
       },
       /**
        * Id of selected section.
@@ -289,7 +289,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     if (navItem) {
       navItem.selected = value;
       if (navItem.selected) {
-        this.sectionId = sectionId;
+        this.selectedId = sectionId;
         this.selectedIndex = this._getNodeIndex(navItem);
       }
     }
@@ -301,16 +301,35 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     return i;
   }
 
-  _selectedChanged(selectedIndex) {
-    this.dispatchEvent(
-      new CustomEvent('selected-changed', {
-        detail: {
-          index: selectedIndex,
-          id: this.selectedId
-        }
-      })
-    );
-    // Horizontal scroll tabs when selected changes
+  _getClosestOffsetParent(parent) {
+    let offsetParent = null;
+    while ((offsetParent = parent.offsetParent) === null) {
+      if (parent.parentElement) parent = parent.parentElement;
+      else break;
+    }
+    return offsetParent || document.body;
+  }
+
+  _fullscreenChanged(fullscreen) {
+    const offsetParent = this._getClosestOffsetParent(this);
+    if (fullscreen) {
+      offsetParent.style.overflow = 'hidden';
+      offsetParent.scrollTop = 0;
+      // Timeout to delay element measurements used for default inner bottom padding calculations
+      setTimeout(() => {
+        const windowHeight = window.innerHeight - this.$.tabs.clientHeight;
+        const paddingBottom = this.last.clientHeight < windowHeight ? windowHeight - this.last.clientHeight : 0;
+        this.style.setProperty('--_anchor-nav-inner-padding', `0 0 ${paddingBottom}px 0`);
+      });
+    } else {
+      offsetParent.style.removeProperty('overflow');
+      this.style.setProperty('--_anchor-nav-inner-padding', '0');
+    }
+  }
+
+  _selectedIndexChanged(selectedIndex) {
+    this.dispatchEvent(new CustomEvent('selected-changed', { detail: { index: selectedIndex, id: this.selectedId } }));
+    // Horizontally scroll tabs when selected changes
     if (this.$.tabs.hasAttribute('overflow') && this.sections.length) {
       const leftOffset = this.$.tabs.root.querySelector('[part="back-button"]').clientWidth * 2;
       const topOffset = this.sections[0].offsetTop;
@@ -320,21 +339,6 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         left: left && left - leftOffset,
         behavior: 'smooth'
       });
-    }
-  }
-
-  _fullscreenChanged(fullscreen) {
-    const body = document.querySelector('body');
-    if (fullscreen) {
-      body.style.overflow = 'hidden';
-      setTimeout(() => {
-        const windowHeight = window.innerHeight - this.$.tabs.clientHeight;
-        const paddingBottom = this.last.clientHeight < windowHeight ? windowHeight - this.last.clientHeight : 0;
-        this.style.setProperty('--_anchor-nav-inner-padding', `0 0 ${paddingBottom}px 0`);
-      });
-    } else {
-      body.style.removeProperty('overflow');
-      this.style.setProperty('--_anchor-nav-inner-padding', '0');
     }
   }
 
