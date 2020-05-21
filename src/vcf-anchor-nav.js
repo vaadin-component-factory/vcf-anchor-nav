@@ -104,7 +104,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         }
       </style>
       <div part="container">
-        <div part="header"><slot name="header"></slot></div>
+        <div id="header" part="header"><slot name="header"></slot></div>
         <vaadin-tabs id="tabs" part="tabs"></vaadin-tabs>
         <slot id="slot"></slot>
       </div>
@@ -217,10 +217,10 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       lastEntry.target.isIntersecting = lastEntry.isIntersecting && lastEntry.intersectionRatio >= observer.thresholds[0];
       this._updateSelected();
     };
-    this.sections.forEach(element => {
+    this.sections.forEach((element, i) => {
       const options = {
         root: this,
-        threshold: this._getThreshold(element.clientHeight)
+        threshold: this._getThreshold(element.clientHeight, i)
       };
       const observer = new IntersectionObserver(callback, options);
       observer.observe(element);
@@ -231,18 +231,20 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     clearTimeout(this._updateSelectedTimeout);
     this._updateSelectedTimeout = setTimeout(() => {
       this._clearSelection();
+      this._thresholds;
       const firstIntersecting = this.sections.filter(i => i.isIntersecting)[0];
       if (firstIntersecting) this._setNavItemSelected(firstIntersecting.id, true);
       else this._setNavItemSelected(this.sections[this.selectedIndex].id, true);
     });
   }
 
-  _getThreshold(sectionHeight) {
+  _getThreshold(sectionHeight, index) {
     // This factor value can be adjusted however
     // Below 0.7 in Firefox the highlighting is inconsistent
     // Above 0.9 all browsers may not work correctly
     const factor = 0.75;
-    const height = this.clientHeight - this.$.tabs.clientHeight;
+    let height = this.clientHeight - this.$.tabs.clientHeight;
+    if (index === 0) height -= this.$.header.clientHeight;
     return sectionHeight > height ? (height / sectionHeight) * factor : 1;
   }
 
@@ -292,10 +294,12 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   _fullscreenChanged(fullscreen) {
     const body = document.querySelector('body');
     if (fullscreen) {
-      const windowHeight = window.innerHeight - this.$.tabs.clientHeight;
-      const paddingBottom = this.last.clientHeight < windowHeight ? windowHeight - this.last.clientHeight : 0;
       body.style.overflow = 'hidden';
-      this.style.setProperty('--_anchor-nav-inner-padding', `0 0 ${paddingBottom}px 0`);
+      setTimeout(() => {
+        const windowHeight = window.innerHeight - this.$.tabs.clientHeight;
+        const paddingBottom = this.last.clientHeight < windowHeight ? windowHeight - this.last.clientHeight : 0;
+        this.style.setProperty('--_anchor-nav-inner-padding', `0 0 ${paddingBottom}px 0`);
+      });
     } else {
       body.style.removeProperty('overflow');
       this.style.setProperty('--_anchor-nav-inner-padding', '0');
