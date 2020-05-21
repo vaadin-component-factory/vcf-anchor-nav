@@ -63,6 +63,11 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           --_anchor-nav-inner-background: var(--lumo-base-color);
           --_anchor-nav-inner-padding: 0;
           --_anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
+          /* 
+           * Chrome scrollbar z-index bugfix
+           * https://github.com/PolymerElements/iron-list/issues/137#issuecomment-176457768
+           */
+          will-change: transform;
         }
 
         :host([fullscreen]) {
