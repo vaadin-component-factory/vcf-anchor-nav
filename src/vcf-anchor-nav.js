@@ -33,9 +33,10 @@ import '@vaadin/vaadin-tabs/vaadin-tab';
  *
  * Custom property | Description | Default
  * ----------------|-------------|-------------
- * `--_anchor-nav-inner-max-width` | `max-width` of inner container (`[part="container"]`) | `auto`
- * `--_anchor-nav-inner-background` | `background` of inner container (`[part="container"]`) | `var(--lumo-base-color)` (`#ffffff`)
- * `--_anchor-nav-inner-padding` | `padding` of inner container (`[part="container"]`) | `0 0 20vh 0`
+ * `--_anchor-nav-inner-max-width` | `max-width` of `"container"` part | `auto`
+ * `--_anchor-nav-inner-background` | `background` of `"container"` part | `#ffffff`
+ * `--_anchor-nav-inner-padding` | `padding` of `"container"` part | `0 0 20vh 0`
+ * `--_anchor-nav-tabs-stuck-box-shadow` | `box-shadow` of `"tabs"` part when stuck to top of viewport | `0 4px 5px -6px rgba(0, 0, 0, 0.4)`
  *
  * The following shadow DOM parts are available for styling:
  *
@@ -61,6 +62,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           --_anchor-nav-inner-max-width: auto;
           --_anchor-nav-inner-background: var(--lumo-base-color);
           --_anchor-nav-inner-padding: 0;
+          --_anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
         }
 
         :host([fullscreen]) {
@@ -89,6 +91,15 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           top: -1px;
           background: var(--lumo-base-color);
           z-index: 1;
+        }
+
+        [part='tabs'][stuck]::after {
+          content: ' ';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          box-shadow: var(--_anchor-nav-tabs-stuck-box-shadow);
+          z-index: -1;
         }
 
         ::slotted(*) {
@@ -167,6 +178,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   ready() {
     super.ready();
     smoothScrollPolyfill();
+    this._initTabsStuckAttribute();
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
   }
 
@@ -229,6 +241,16 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       };
       const observer = new IntersectionObserver(callback, options);
       observer.observe(element);
+    });
+  }
+
+  _initTabsStuckAttribute() {
+    setTimeout(() => {
+      const observer = new IntersectionObserver(([e]) => e.target.toggleAttribute('stuck', e.intersectionRatio < 1), {
+        root: this,
+        threshold: 1
+      });
+      observer.observe(this.$.tabs);
     });
   }
 
