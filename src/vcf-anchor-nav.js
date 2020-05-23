@@ -10,6 +10,7 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin';
 import { ElementMixin } from '@vaadin/vaadin-element-mixin';
 import { smoothScrollPolyfill } from '../lib/common-js-modules.esm';
+import { ResizeObserver } from '@juggle/resize-observer';
 import '@vaadin/vaadin-license-checker/vaadin-license-checker';
 import '@vaadin/vaadin-tabs/vaadin-tabs';
 import '@vaadin/vaadin-tabs/vaadin-tab';
@@ -119,7 +120,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           padding: 0 var(--lumo-space-m);
         }
       </style>
-      <div part="container">
+      <div id="container" part="container">
         <div id="header" part="header"><slot name="header"></slot></div>
         <vaadin-tabs id="tabs" part="tabs"></vaadin-tabs>
         <slot id="slot"></slot>
@@ -184,6 +185,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     super.ready();
     smoothScrollPolyfill();
     this._initTabsStuckAttribute();
+    this._initContainerResizeObserver();
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
   }
 
@@ -232,6 +234,11 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     }
   }
 
+  _initContainerResizeObserver() {
+    const observer = new ResizeObserver(() => this._initTabHighlight());
+    observer.observe(this.$.container);
+  }
+
   _initTabHighlight() {
     const callback = (entries, observer) => {
       const lastEntry = entries[entries.length - 1];
@@ -263,7 +270,6 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     clearTimeout(this._updateSelectedTimeout);
     this._updateSelectedTimeout = setTimeout(() => {
       this._clearSelection();
-      this._thresholds;
       const firstIntersecting = this.sections.filter(i => i.isIntersecting)[0];
       if (firstIntersecting) this._setNavItemSelected(firstIntersecting.id, true);
       else this._setNavItemSelected(this.sections[this.selectedIndex].id, true);
