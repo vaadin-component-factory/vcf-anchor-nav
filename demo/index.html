@@ -12,10 +12,10 @@
           background-color: var(--lumo-base-color);
           padding: 0;
         }
-        h1 {
+        h1.main {
           padding: 0 0 var(--lumo-space-l) var(--lumo-space-m);
         }
-        h2 {
+        h2.main {
           padding: var(--lumo-space-l) 0 var(--lumo-space-l) var(--lumo-space-m);
         }
         vcf-anchor-nav.main {
@@ -64,10 +64,10 @@
         </vaadin-button>
       </a>
 
-      <h1 slot="header" class="hidden"><code>&lt;vcf-anchor-nav&gt;</code></h1>
+      <h1 slot="header" class="main hidden"><code>&lt;vcf-anchor-nav&gt;</code></h1>
 
       <vcf-anchor-nav-section name="Basic">
-        <h2 slot="header" class="hidden">Basic</h2>
+        <h2 slot="header" class="main hidden">Basic</h2>
         <demo-snippet>
           <template>
             <vcf-anchor-nav style="height: 50vh;">
@@ -86,7 +86,7 @@
       </vcf-anchor-nav-section>
 
       <vcf-anchor-nav-section name="Fullscreen">
-        <h2 slot="header" class="hidden">Fullscreen</h2>
+        <h2 slot="header" class="main hidden">Fullscreen</h2>
         <demo-snippet>
           <template>
             <style>
