@@ -105,8 +105,9 @@
     "url": "https://github.com/vaadin-component-factory/vcf-anchor-nav/issues"
   },
   "files": [
+    "lib",
     "src",
-    "lib"
+    "theme"
   ],
   "homepage": "https://github.com/vaadin-component-factory/vcf-anchor-nav#readme",
   "directories": {
