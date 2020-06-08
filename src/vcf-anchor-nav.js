@@ -11,6 +11,7 @@ import { ThemableMixin } from '@vaadin/vaadin-themable-mixin';
 import { ElementMixin } from '@vaadin/vaadin-element-mixin';
 import { smoothScrollPolyfill } from '../lib/common-js-modules.esm';
 import { ResizeObserver } from '@juggle/resize-observer';
+import stickybits from 'stickybits';
 import '@vaadin/vaadin-license-checker/vaadin-license-checker';
 import '@vaadin/vaadin-tabs/vaadin-tabs';
 import '@vaadin/vaadin-tabs/vaadin-tab';
@@ -93,8 +94,9 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         }
 
         [part='tabs'] {
+          position: -webkit-sticky;
           position: sticky;
-          top: -1px;
+          top: -1px !important;
           background: var(--lumo-base-color);
           z-index: 1;
         }
@@ -184,6 +186,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   ready() {
     super.ready();
     smoothScrollPolyfill();
+    stickybits(this.$.tabs);
     this._initTabsStuckAttribute();
     this._initContainerResizeObserver();
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
