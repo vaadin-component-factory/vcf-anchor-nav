@@ -72,14 +72,34 @@
           <template>
             <vcf-anchor-nav style="height: 50vh;">
               <h1 slot="header">Main Header</h1>
-              <vcf-anchor-nav-section name="First">Section 1</vcf-anchor-nav-section>
-              <vcf-anchor-nav-section style="height: 20vh;">Section 2</vcf-anchor-nav-section>
-              <vcf-anchor-nav-section>
-                <h1 slot="header">Custom Header</h1>
-                Section 3
+              <vcf-anchor-nav-section name="Introduction">
+                Scroll down to see:
+                <ul>
+                  <li>Tabs sticking to the top</li>
+                  <li>Tab of visible section being highlighted</li>
+                  <li>Tabs horizontally scrolling when overflowing</li>
+                </ul>
+                Click on a tab to jump to section.
               </vcf-anchor-nav-section>
-              <vcf-anchor-nav-section style="height: 120vh;">Section 4</vcf-anchor-nav-section>
-              <vcf-anchor-nav-section>Section 5</vcf-anchor-nav-section>
+              <vcf-anchor-nav-section name="Accessibility">
+                Accessibility has been taken seriously when implementing the component.
+                <ol>
+                  <li>Try focusing tabs using keyboard, move focus with arrow keys</li>
+                  <li>Hit ENTER or SPACE to jump to sections</li>
+                  <li>Move focus to this text field by hitting TAB</li>
+                </ol>
+                <vaadin-text-field></vaadin-text-field>
+              </vcf-anchor-nav-section>
+              <vcf-anchor-nav-section name="Custom Tab Name">
+                <h1 slot="header">Custom Header</h1>
+                Headers and tab names are set automatically. You can customize them to your needs.
+              </vcf-anchor-nav-section>
+              <vcf-anchor-nav-section style="height: 20vh;">
+                Section 4 is short.
+              </vcf-anchor-nav-section>
+              <vcf-anchor-nav-section style="height: 120vh;">
+                Section 5 is long.
+              </vcf-anchor-nav-section>
             </vcf-anchor-nav>
           </template>
         </demo-snippet>
