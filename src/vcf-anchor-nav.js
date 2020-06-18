@@ -218,7 +218,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
             top: section.offsetTop - this.$.tabs.clientHeight,
             behavior: 'smooth'
           });
-          history.pushState(null, null, a.href);
+          history.pushState(null, null, `${location.pathname}#${section.id}`);
         });
         this.$.tabs.appendChild(tab);
       });
