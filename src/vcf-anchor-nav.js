@@ -142,20 +142,24 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   static get properties() {
     return {
       /**
+       * Id of selected section.
+       * @type {String}
+       */
+      selectedId: {
+        type: String,
+        observer: '_selectedIdChanged'
+      },
+
+      /**
        * Index of selected section.
        * @type {Number}
-       * @readonly
        */
       selectedIndex: {
         type: Number,
         value: 0,
         observer: '_selectedIndexChanged'
       },
-      /**
-       * Id of selected section.
-       * @type {String}
-       */
-      selectedId: String,
+
       /**
        * Component fills the entire screen.
        * @type {String}
@@ -164,6 +168,15 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         type: Boolean,
         reflectToAttribute: true,
         observer: '_fullscreenChanged'
+      },
+
+      /**
+       * Disables preserving of selected tab and scroll position on refresh.
+       * @type {Boolean}
+       */
+      disablePreserveOnRefresh: {
+        type: Boolean,
+        value: false
       }
     };
   }
@@ -191,6 +204,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     this._initTabsStuckAttribute();
     this._initContainerResizeObserver();
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
+    window.addEventListener('popstate', () => this._scrollToHash());
   }
 
   _onSlotChange() {
@@ -213,29 +227,27 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         tab.id = `${section.id}-tab`;
         tab.appendChild(a);
         tab.addEventListener('click', () => {
-          this.selectedIndex = i;
-          this.scrollTo({
-            top: section.offsetTop - this.$.tabs.clientHeight,
-            behavior: 'smooth'
-          });
-          history.pushState(null, null, `${location.pathname}#${section.id}`);
+          this.selectedId = section.id;
+          this._scrollToSection(this.selectedId);
+          const path = location.pathname[location.pathname.length - 1] === '/' ? location.pathname : location.pathname + '/';
+          history.pushState(null, null, `${path}#${section.id}`);
         });
         this.$.tabs.appendChild(tab);
       });
       this._initTabHighlight();
-      // Hack to fix initial scroll on Firefox
-      setTimeout(() => {
-        // Scroll to and select section in URL hash if possible
-        if (location.hash) {
-          const section = this.querySelector(location.hash);
-          if (section) {
-            this.scrollTo({ top: section.offsetTop - this.$.tabs.clientHeight });
-            this._clearSelection();
-            this._setNavItemSelected(location.hash.replace('#', ''), true);
-          }
-        }
-      });
+      if (!this.disablePreserveOnRefresh) this._scrollToHash();
     }
+  }
+
+  _scrollToHash() {
+    // Hack to fix initial scroll on Firefox
+    setTimeout(() => {
+      // Scroll to and select section in URL hash if possible
+      const section = location.hash && this.querySelector(location.hash);
+      const top = section ? section.offsetTop - this.$.tabs.clientHeight : 0;
+      this.scrollTo({ top });
+      if (section) this.selectedId = location.hash.replace('#', '');
+    });
   }
 
   _initContainerResizeObserver() {
@@ -253,7 +265,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     this.sections.forEach((element, i) => {
       const options = {
         root: this,
-        threshold: this._getThreshold(element.clientHeight, i)
+        threshold: this._getIntersectionThreshold(element.clientHeight, i)
       };
       const observer = new IntersectionObserver(callback, options);
       observer.observe(element);
@@ -273,41 +285,44 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   _updateSelected() {
     clearTimeout(this._updateSelectedTimeout);
     this._updateSelectedTimeout = setTimeout(() => {
-      this._clearSelection();
       const firstIntersecting = this.sections.filter(i => i.isIntersecting)[0];
-      if (firstIntersecting) this._setNavItemSelected(firstIntersecting.id, true);
-      else this._setNavItemSelected(this.sections[this.selectedIndex].id, true);
+      if (firstIntersecting) this.selectedIndex = this._getTabIndex(firstIntersecting.id);
     });
   }
 
-  _getThreshold(sectionHeight, index) {
-    // This factor value can be adjusted however
-    // Below 0.7 in Firefox the highlighting is inconsistent
-    // Above 0.9 all browsers may not work correctly
+  _getIntersectionThreshold(sectionHeight, index) {
+    // This factor value can be adjusted, however
+    // - below 0.7 in Firefox the intersecting events are inconsistent
+    // - above 0.9 all browsers intersecting events may not work as expected
     const factor = 0.75;
     let height = this.clientHeight - this.$.tabs.clientHeight;
     if (index === 0) height -= this.$.header.clientHeight;
     return sectionHeight > height ? (height / sectionHeight) * factor : 1;
   }
 
-  _clearSelection() {
+  _selectTab(sectionId) {
     this.$.tabs.querySelectorAll('vaadin-tab').forEach(tab => (tab.selected = false));
-  }
-
-  _setNavItemSelected(sectionId, value) {
-    const navItem = this.$.tabs.querySelector(`#${sectionId}-tab`);
-    if (navItem) {
-      navItem.selected = value;
-      if (navItem.selected) {
-        this.selectedId = sectionId;
-        this.selectedIndex = this._getNodeIndex(navItem);
-      }
+    const tab = this.$.tabs.querySelector(`#${sectionId}-tab`);
+    if (tab) tab.selected = true;
+    // Horizontally scroll tabs when selected changes
+    if (this.$.tabs.hasAttribute('overflow') && this.sections.length) {
+      const leftOffset = this.$.tabs.root.querySelector('[part="back-button"]').clientWidth * 2;
+      const topOffset = this.sections[0].offsetTop;
+      const scrollRatio = (this.sections[this.selectedIndex].offsetTop - topOffset) / (this.scrollHeight - topOffset);
+      const left = this.$.tabs.$.scroll.scrollWidth * scrollRatio;
+      this.$.tabs.$.scroll.scrollTo({
+        left: left && left - leftOffset,
+        behavior: 'smooth'
+      });
     }
+    this.dispatchEvent(new CustomEvent('selected-changed', { detail: { index: this.selectedIndex, id: this.selectedId } }));
   }
 
-  _getNodeIndex(element) {
+  _getTabIndex(sectionId) {
+    let tab = sectionId && this.$.tabs.querySelector(`#${sectionId}-tab`);
     let i = 0;
-    while ((element = element.previousSibling) !== null) i++;
+    if (tab) while ((tab = tab.previousSibling) !== null) i++;
+    else i = this.selectedIndex;
     return i;
   }
 
@@ -337,18 +352,30 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     }
   }
 
-  _selectedIndexChanged(selectedIndex) {
-    this.dispatchEvent(new CustomEvent('selected-changed', { detail: { index: selectedIndex, id: this.selectedId } }));
-    // Horizontally scroll tabs when selected changes
-    if (this.$.tabs.hasAttribute('overflow') && this.sections.length) {
-      const leftOffset = this.$.tabs.root.querySelector('[part="back-button"]').clientWidth * 2;
-      const topOffset = this.sections[0].offsetTop;
-      const scrollRatio = (this.sections[selectedIndex].offsetTop - topOffset) / (this.scrollHeight - topOffset);
-      const left = this.$.tabs.$.scroll.scrollWidth * scrollRatio;
-      this.$.tabs.$.scroll.scrollTo({
-        left: left && left - leftOffset,
+  _scrollToSection(sectionId) {
+    const section = sectionId && this.querySelector(`#${sectionId}`);
+    if (section) {
+      this.scrollTo({
+        top: section.offsetTop - this.$.tabs.clientHeight,
         behavior: 'smooth'
       });
+    }
+  }
+
+  _selectedIdChanged(selectedId) {
+    const selectedIndex = this._getTabIndex(selectedId);
+    if (this.selectedIndex !== selectedIndex) {
+      this._selectTab(selectedId);
+      this.selectedIndex = selectedIndex;
+    }
+  }
+
+  _selectedIndexChanged(selectedIndex) {
+    const tab = this.$.tabs.querySelectorAll('vaadin-tab')[selectedIndex] || '';
+    const selectedId = tab && tab.id.substring(0, tab.id.length - 4);
+    if (this.selectedId !== selectedId) {
+      this._selectTab(selectedId);
+      this.selectedId = selectedId;
     }
   }
 
