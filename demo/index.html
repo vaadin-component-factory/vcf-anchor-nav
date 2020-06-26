@@ -52,6 +52,17 @@
       window.addEventListener('WebComponentsReady', () => {
         setTimeout(() => document.querySelector('body').style.removeProperty('overflow'));
         document.querySelectorAll('.hidden').forEach(element => element.classList.remove('hidden'));
+        document.querySelectorAll('demo-snippet').forEach(element => {
+          const codeContainer = element.shadowRoot.querySelector('.code-container');
+          const copyButton = codeContainer.querySelector('#copyButton');
+          // Code Container max height
+          codeContainer.style.maxHeight = '600px';
+          // Sticky Copy Button
+          codeContainer.addEventListener('scroll', e => (copyButton.style.top = e.target.scrollTop + 'px'), {
+            capture: true,
+            passive: true
+          });
+        });
       });
     </script>
   </head>
