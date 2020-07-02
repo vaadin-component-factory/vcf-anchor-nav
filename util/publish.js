@@ -18,7 +18,7 @@ if (!version.match(semverRegex)) {
 }
 
 // Version property update
-const srcPath = path.resolve(__dirname, '../src/', 'vcf-enhanced-dialog.js');
+const srcPath = path.resolve(__dirname, '../src/', 'vcf-anchor-nav.js');
 let srcString = readFileSync(srcPath, 'utf8');
 const replaceRegex = /get version.*?'(\d\.\d\.\d)';/s;
 const matches = replaceRegex.exec(srcString);

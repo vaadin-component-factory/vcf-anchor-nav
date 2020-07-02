@@ -10,6 +10,15 @@ import { ElementMixin } from '@vaadin/vaadin-element-mixin';
  * <vcf-anchor-nav-section name="Section 1"></vcf-anchor-nav-section>
  * ```
  *
+ * ### Styling
+ *
+ * The following custom properties are available for styling:
+ *
+ * Custom property | Description | Default
+ * ----------------|-------------|-------------
+ * `--anchor-nav-section-border-width` | `border-width` of section. | `0`
+ * `--anchor-nav-section-border-color` | `border-color` of section. | `var(--lumo-contrast-10pct)`
+ *
  * The following shadow DOM parts are available for styling:
  *
  * Part name | Description
@@ -44,8 +53,12 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
     return html`
       <style>
         :host {
-          display: block;
-          height: 50vh;
+          --anchor-nav-section-border-width: 0;
+          --anchor-nav-section-border-color: var(--lumo-contrast-10pct);
+        }
+
+        :host(:not(:last-of-type)) {
+          border-bottom: var(--anchor-nav-section-border-width) solid var(--anchor-nav-section-border-color);
         }
 
         #default-header,

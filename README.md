@@ -40,9 +40,9 @@ Add `<vcf-anchor-nav>` element to the page.
 
 1. Run `npm start` to open the demo.
 
-## Contributing
+## Server-side API
 
-To contribute to the component, please read [the guideline](https://github.com/vaadin/vaadin-core/blob/master/CONTRIBUTING.md) first.
+This is the client-side (Polymer 3) web component. If you are looking for this web components server-side (Java) API for the Vaadin Platform, it can be found here: https://vaadin.com/directory/component/svg-component
 
 ## Vaadin Prime
 

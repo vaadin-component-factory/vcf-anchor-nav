@@ -34,10 +34,10 @@ import '@vaadin/vaadin-tabs/vaadin-tab';
  *
  * Custom property | Description | Default
  * ----------------|-------------|-------------
- * `--_anchor-nav-inner-max-width` | `max-width` of `"container"` part | `auto`
- * `--_anchor-nav-inner-background` | `background` of `"container"` part | `#ffffff`
- * `--_anchor-nav-inner-padding` | `padding` of `"container"` part | `0 0 20vh 0`
- * `--_anchor-nav-tabs-stuck-box-shadow` | `box-shadow` of `"tabs"` part when stuck to top of viewport | `0 4px 5px -6px rgba(0, 0, 0, 0.4)`
+ * `--anchor-nav-inner-max-width` | `max-width` of "container" part. | `auto`
+ * `--anchor-nav-inner-background` | `background` of "container" part. | `#ffffff`
+ * `--anchor-nav-inner-padding` | `padding` of "container" part. | `0 0 20vh 0`
+ * `--anchor-nav-tabs-stuck-box-shadow` | `box-shadow` of "tabs" part when stuck to top of viewport. | `0 4px 5px -6px rgba(0, 0, 0, 0.4)`
  *
  * The following shadow DOM parts are available for styling:
  *
@@ -60,21 +60,23 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           display: block;
           overflow: auto;
           position: relative;
+          width: 100%;
           height: 100%;
           max-height: 100vh;
-          --_anchor-nav-inner-max-width: auto;
-          --_anchor-nav-inner-background: var(--lumo-base-color);
-          --_anchor-nav-inner-padding: 0;
-          --_anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
+          --anchor-nav-inner-max-width: auto;
+          --anchor-nav-inner-background: var(--lumo-base-color);
+          --anchor-nav-inner-padding: 0;
+          --anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
           /* 
            * Chrome scrollbar z-index bugfix
            * https://github.com/PolymerElements/iron-list/issues/137#issuecomment-176457768
            */
           will-change: transform;
+          -webkit-overflow-scrolling: touch;
         }
 
         :host([fullscreen]) {
-          height: 100vh;
+          height: 100vh !important;
           position: fixed;
           top: 0;
           bottom: 0;
@@ -89,9 +91,9 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           flex-direction: column;
           width: 100%;
           margin: auto;
-          max-width: var(--_anchor-nav-inner-max-width);
-          padding: var(--_anchor-nav-inner-padding);
-          background: var(--_anchor-nav-inner-background);
+          max-width: var(--anchor-nav-inner-max-width);
+          padding: var(--anchor-nav-inner-padding);
+          background: var(--anchor-nav-inner-background);
         }
 
         [part='tabs'] {
@@ -107,7 +109,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           position: absolute;
           width: 100%;
           height: 100%;
-          box-shadow: var(--_anchor-nav-tabs-stuck-box-shadow);
+          box-shadow: var(--anchor-nav-tabs-stuck-box-shadow);
           z-index: -1;
         }
 
@@ -115,12 +117,12 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
           flex: 0 0 auto;
         }
 
-        ::slotted(vcf-anchor-nav-section:nth-child(even)) {
-          background: var(--lumo-shade-5pct);
-        }
-
         ::slotted([slot='header']) {
           padding: 0 var(--lumo-space-m);
+        }
+
+        :host([theme~='expand-last']) ::slotted(vcf-anchor-nav-section:last-of-type) {
+          min-height: calc(100vh - var(--lumo-size-l));
         }
       </style>
       <div id="container" part="container">
@@ -207,10 +209,16 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     window.addEventListener('popstate', () => this._scrollToHash());
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this._offsetAncestor = this._getClosestOffsetParent(this);
+  }
+
   _onSlotChange() {
     this.$.tabs.innerHTML = '';
     if (this.sections.length) {
       this.sections.forEach((section, i) => {
+        const path = this._getAnchorHref();
         const tab = document.createElement('vaadin-tab');
         const a = document.createElement('a');
         section.name = section.name || `Section ${i + 1}`;
@@ -222,14 +230,12 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
             .toLowerCase();
         a.innerText = section.name;
         a.id = `${section.id}-anchor`;
-        a.href = `#${section.id}`;
+        a.href = `${path}#${section.id}`;
         a.addEventListener('click', e => e.preventDefault());
         tab.id = `${section.id}-tab`;
         tab.appendChild(a);
         tab.addEventListener('click', () => {
-          this.selectedId = section.id;
-          this._scrollToSection(this.selectedId);
-          const path = location.pathname[location.pathname.length - 1] === '/' ? location.pathname : location.pathname + '/';
+          this._scrollToSection(section.id);
           history.pushState(null, null, `${path}#${section.id}`);
         });
         this.$.tabs.appendChild(tab);
@@ -237,6 +243,10 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       this._initTabHighlight();
       if (!this.disablePreserveOnRefresh) this._scrollToHash();
     }
+  }
+
+  _getAnchorHref() {
+    return location.pathname[location.pathname.length - 1] === '/' ? location.pathname : location.pathname + '/';
   }
 
   _scrollToHash() {
@@ -336,19 +346,13 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   _fullscreenChanged(fullscreen) {
-    const offsetParent = this._getClosestOffsetParent(this);
+    // Removes double scrollbars
+    const offsetParent = this._offsetAncestor || document.body;
     if (fullscreen) {
       offsetParent.style.overflow = 'hidden';
       offsetParent.scrollTop = 0;
-      // Timeout to delay element measurements used for default inner bottom padding calculations
-      setTimeout(() => {
-        const windowHeight = window.innerHeight - this.$.tabs.clientHeight;
-        const paddingBottom = this.last.clientHeight < windowHeight ? windowHeight - this.last.clientHeight : 0;
-        this.style.setProperty('--_anchor-nav-inner-padding', `0 0 ${paddingBottom}px 0`);
-      });
     } else {
       offsetParent.style.removeProperty('overflow');
-      this.style.setProperty('--_anchor-nav-inner-padding', '0');
     }
   }
 
