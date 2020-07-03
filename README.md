@@ -4,6 +4,14 @@
 [![npm version](https://badgen.net/npm/v/@vaadin-component-factory/vcf-anchor-nav)](https://www.npmjs.com/package/@vaadin-component-factory/vcf-anchor-nav)
 [![Published on Vaadin Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/vaadin-component-factoryvcf-anchor-nav)
 
+Web Component for easily creating layouts with sticky anchor navigation tabs and content sections.
+
+- Automates the linking of tabs and sections.
+- Smooth scrolls to section on tab click and sets the URL hash.
+- Scrolls to URL hash on load (preserve selected tab on refresh).
+
+![vcf-anchor-nav screen capture gif](https://user-images.githubusercontent.com/3392815/86487873-f8b34200-bd67-11ea-9c3d-b645e44da6a4.gif)
+
 [Live demo ↗](https://vcf-anchor-nav.netlify.com)
 |
 [API documentation ↗](https://vcf-anchor-nav.netlify.com/api/#/elements/Vaadin.VcfAnchorNav)
@@ -24,10 +32,15 @@ Once installed, import it in your application:
 import '@vaadin-component-factory/vcf-anchor-nav';
 ```
 
-Add `<vcf-anchor-nav>` element to the page.
+Add `<vcf-anchor-nav>` element and `<vcf-anchor-nav-section>`s to the page.
 
 ```html
-<vcf-anchor-nav></vcf-anchor-nav>
+<vcf-anchor-nav>
+  <h1 slot="header">Header</h1>
+  <vcf-anchor-nav-section name="One"> ... </vcf-anchor-nav-section>
+  <vcf-anchor-nav-section name="Two"> ... </vcf-anchor-nav-section>
+  <vcf-anchor-nav-section name="Three"> ... </vcf-anchor-nav-section>
+</vcf-anchor-nav>
 ```
 
 ## Running demo
@@ -42,7 +55,7 @@ Add `<vcf-anchor-nav>` element to the page.
 
 ## Server-side API
 
-This is the client-side (Polymer 3) web component. If you are looking for this web components server-side (Java) API for the Vaadin Platform, it can be found here: https://vaadin.com/directory/component/svg-component
+This is the client-side (Polymer 3) web component. If you are looking for this web components server-side (Java) API for the Vaadin Platform, it can be found here: https://vaadin.com/directory/component/anchor-nav-for-flow
 
 ## Vaadin Prime
 

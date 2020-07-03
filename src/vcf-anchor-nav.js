@@ -17,14 +17,18 @@ import '@vaadin/vaadin-tabs/vaadin-tab';
 
 /**
  * `<vcf-anchor-nav>`
- * Component with tabs used as anchor navigation and content sections.
- * Automates the linking of tabs and sections.
+ * Web Component for easily creating layouts with sticky anchor navigation tabs and content sections.
+ *
+ * - Automates the linking of tabs and sections.
+ * - Smooth scrolls to section on tab click and sets the URL hash.
+ * - Scrolls to URL hash on load (preserve selected tab on refresh).
  *
  * ```html
  * <vcf-anchor-nav>
- *   <vcf-anchor-nav-section name="One">Section 1</vcf-anchor-nav-section>
- *   <vcf-anchor-nav-section name="Two">Section 2</vcf-anchor-nav-section>
- *   <vcf-anchor-nav-section name="Three">Section 3</vcf-anchor-nav-section>
+ *   <h1 slot="header">Header</h1>
+ *   <vcf-anchor-nav-section name="One"> ... </vcf-anchor-nav-section>
+ *   <vcf-anchor-nav-section name="Two"> ... </vcf-anchor-nav-section>
+ *   <vcf-anchor-nav-section name="Three"> ... </vcf-anchor-nav-section>
  * </vcf-anchor-nav>
  * ```
  *
@@ -138,7 +142,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   static get version() {
-    return '1.0.4';
+    return '1.0.5';
   }
 
   static get properties() {
