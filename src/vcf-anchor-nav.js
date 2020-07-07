@@ -297,11 +297,8 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   _updateSelected() {
-    clearTimeout(this._updateSelectedTimeout);
-    this._updateSelectedTimeout = setTimeout(() => {
-      const firstIntersecting = this.sections.filter(i => i.isIntersecting)[0];
-      if (firstIntersecting) this.selectedIndex = this._getTabIndex(firstIntersecting.id);
-    });
+    const firstIntersecting = this.sections.filter(i => i.isIntersecting)[0];
+    if (firstIntersecting) this.selectedIndex = this._getTabIndex(firstIntersecting.id);
   }
 
   _getIntersectionThreshold(sectionHeight, index) {
