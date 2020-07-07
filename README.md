@@ -10,7 +10,7 @@ Web Component for easily creating layouts with sticky anchor navigation tabs and
 - Smooth scrolls to section on tab click and sets the URL hash.
 - Scrolls to URL hash on load (preserve selected tab on refresh).
 
-![vcf-anchor-nav screen capture gif](https://user-images.githubusercontent.com/3392815/86487873-f8b34200-bd67-11ea-9c3d-b645e44da6a4.gif)
+![GIF for Vaadin Component Factory anchor nav](https://user-images.githubusercontent.com/3392815/86610834-8be1b700-bfb6-11ea-8009-59fe01c75c28.gif)
 
 [Live demo ↗](https://vcf-anchor-nav.netlify.com)
 |
@@ -55,14 +55,14 @@ Add `<vcf-anchor-nav>` element and `<vcf-anchor-nav-section>`s to the page.
 
 ## Server-side API
 
-This is the client-side (Polymer 3) web component. If you are looking for this web components server-side (Java) API for the Vaadin Platform, it can be found here: https://vaadin.com/directory/component/anchor-nav-for-flow
+This is the client-side (Polymer 3) web component. If you are looking for the server-side (Java) API for the Vaadin Platform, it can be found here: [Anchor Nav](https://vaadin.com/directory/component/anchor-nav-for-flow)
 
 ## Vaadin Prime
 
-This component is available in the Vaadin Prime subscription. It is still open source, but you need to have a valid CVAL license in order to use it. Read more at: https://vaadin.com/pricing
+This component is available in the Vaadin Prime subscription. It is still open source, but you need to have a valid CVAL license in order to use it. Read more at: [Pricing](https://vaadin.com/pricing)
 
 ## License
 
-Commercial Vaadin Add-on License version 3 (CVALv3). For license terms, see LICENSE.
+Commercial Vaadin Add-on License version 3 (CVALv3). For license terms, see: [LICENSE](https://github.com/vaadin-component-factory/vcf-anchor-nav/blob/master/LICENSE)
 
-Vaadin collects development time usage statistics to improve this product. For details and to opt-out, see https://github.com/vaadin/vaadin-usage-statistics.
+Vaadin collects development time usage statistics to improve this product. For details and to opt-out, see: [Vaadin Usage Statistics](https://github.com/vaadin/vaadin-usage-statistics)
