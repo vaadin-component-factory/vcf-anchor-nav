@@ -203,6 +203,10 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     return this.sections[this.sections.length - 1];
   }
 
+  get _tabHeight() {
+    return this._verticalTabs ? 0 : this.$.tabs.clientHeight;
+  }
+
   ready() {
     super.ready();
     smoothScrollPolyfill();
@@ -211,6 +215,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     this._initContainerResizeObserver();
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
     window.addEventListener('popstate', () => this._scrollToHash());
+    this._verticalTabs = false;
   }
 
   connectedCallback() {
@@ -258,14 +263,17 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     setTimeout(() => {
       // Scroll to and select section in URL hash if possible
       const section = location.hash && this.querySelector(location.hash);
-      const top = section ? section.offsetTop - this.$.tabs.clientHeight : 0;
+      const top = section ? section.offsetTop - this._tabHeight : 0;
       this.scrollTo({ top });
       if (section) this.selectedId = location.hash.replace('#', '');
     });
   }
 
   _initContainerResizeObserver() {
-    const observer = new ResizeObserver(() => this._initTabHighlight());
+    const observer = new ResizeObserver(() => {
+      this._initTabHighlight();
+      this._scrollToSection(this.selectedId);
+    });
     observer.observe(this.$.container);
   }
 
@@ -306,9 +314,9 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     // - below 0.7 in Firefox the intersecting events are inconsistent
     // - above 0.9 all browsers intersecting events may not work as expected
     const factor = 0.75;
-    let height = this.clientHeight - this.$.tabs.clientHeight;
+    let height = this.clientHeight - this._tabHeight;
     if (index === 0) height -= this.$.header.clientHeight;
-    return sectionHeight > height ? (height / sectionHeight) * factor : 1;
+    return sectionHeight >= height ? (height / sectionHeight) * factor : 1;
   }
 
   _selectTab(sectionId) {
@@ -361,7 +369,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     const section = sectionId && this.querySelector(`#${sectionId}`);
     if (section) {
       this.scrollTo({
-        top: section.offsetTop - this.$.tabs.clientHeight,
+        top: section.offsetTop - this._tabHeight,
         behavior: 'smooth'
       });
     }
