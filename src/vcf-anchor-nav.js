@@ -142,7 +142,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   static get version() {
-    return '1.0.7';
+    return '1.0.8';
   }
 
   static get properties() {
@@ -272,7 +272,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   _initContainerResizeObserver() {
     const observer = new ResizeObserver(() => {
       this._initTabHighlight();
-      this._scrollToSection(this.selectedId);
+      this.scrollTo({ top: this.querySelector(`#${this.selectedId}`).offsetTop - this._tabHeight });
     });
     observer.observe(this.$.container);
   }
