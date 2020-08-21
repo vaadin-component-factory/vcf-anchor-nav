@@ -214,7 +214,10 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     this._initTabsStuckAttribute();
     this._initContainerResizeObserver();
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
-    window.addEventListener('popstate', () => this._scrollToHash());
+    window.addEventListener('popstate', () => {
+      this._initTabHighlight();
+      this._scrollToHash();
+    });
     this._verticalTabs = false;
   }
 
@@ -255,7 +258,8 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   _getAnchorHref() {
-    return location.pathname[location.pathname.length - 1] === '/' ? location.pathname : location.pathname + '/';
+    const end = location.pathname.length - 1;
+    return location.pathname[end] === '/' ? location.pathname : location.pathname + '/';
   }
 
   _scrollToHash() {

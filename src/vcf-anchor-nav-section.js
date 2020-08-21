@@ -76,7 +76,7 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
           <h2 id="default-header">[[name]]</h2>
         </slot>
       </div>
-      <div id="content" paer="content">
+      <div id="content" part="content">
         <slot></slot>
       </div>
     `;
