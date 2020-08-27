@@ -37,4 +37,4 @@ execSync(`git commit -a -m "v${version}"`);
 execSync('git push');
 
 // Publish to npm
-execSync('npm publish --access public');
+execSync('npm publish');
