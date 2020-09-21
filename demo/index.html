@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes" />
     <title>vcf-anchor-nav demo</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet" />
-    <script dev src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-    <script dev type="module" src="demo.js"></script>
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script type="module" src="demo.js"></script>
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
         body {
@@ -159,7 +159,7 @@
           <template>
             <style>
               #fullscreen {
-                height: 75vh;
+                height: 50vh;
                 --anchor-nav-inner-max-width: 1000px;
               }
               #fullscreen[fullscreen] {
@@ -183,9 +183,28 @@
 
             <script>
               window.addEventListener('WebComponentsReady', () => {
+                // Set section height to avoid resize calculations
+                const anchorNavSection = document.querySelector('#fullscreen-example');
+                anchorNavSection.style.height = anchorNavSection.clientHeight + 'px';
+
                 document.querySelector('#fullscreen vaadin-button').addEventListener('click', () => {
+                  // Toggle fullscreen
                   const anchorNav = document.querySelector('#fullscreen');
                   anchorNav.fullscreen = !anchorNav.fullscreen;
+                  // Get closest offset parent
+                  let parent = anchorNav;
+                  let offsetParent = null;
+                  while ((offsetParent = parent.offsetParent) === null) {
+                    if (parent.parentElement) parent = parent.parentElement;
+                    else break;
+                  }
+                  // Removes double scrollbars
+                  if (anchorNav.fullscreen) {
+                    offsetParent.scrollTop = 0;
+                    offsetParent.style.overflow = 'hidden';
+                  } else {
+                    offsetParent.style.removeProperty('overflow');
+                  }
                 });
               });
             </script>

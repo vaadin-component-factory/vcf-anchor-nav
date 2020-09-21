@@ -172,8 +172,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
        */
       fullscreen: {
         type: Boolean,
-        reflectToAttribute: true,
-        observer: '_fullscreenChanged'
+        reflectToAttribute: true
       },
 
       /**
@@ -219,11 +218,6 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       this._scrollToHash();
     });
     this._verticalTabs = false;
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this._offsetAncestor = this._getClosestOffsetParent(this);
   }
 
   _onSlotChange() {
@@ -351,26 +345,6 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     if (tab) while ((tab = tab.previousSibling) !== null) i++;
     else i = this.selectedIndex;
     return i;
-  }
-
-  _getClosestOffsetParent(parent) {
-    let offsetParent = null;
-    while ((offsetParent = parent.offsetParent) === null) {
-      if (parent.parentElement) parent = parent.parentElement;
-      else break;
-    }
-    return offsetParent || document.body;
-  }
-
-  _fullscreenChanged(fullscreen) {
-    // Removes double scrollbars
-    const offsetParent = this._offsetAncestor || document.body;
-    if (fullscreen) {
-      offsetParent.style.overflow = 'hidden';
-      offsetParent.scrollTop = 0;
-    } else {
-      offsetParent.style.removeProperty('overflow');
-    }
   }
 
   _scrollToSection(sectionId) {
