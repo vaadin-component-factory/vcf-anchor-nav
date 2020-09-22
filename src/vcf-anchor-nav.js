@@ -313,7 +313,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
 
   _getIntersectionThreshold(sectionHeight, index) {
     // This factor value can be adjusted, however
-    // - below 0.7 in Firefox the intersecting events are inconsistent
+    // - below 0.7 in Firefox intersecting events are inconsistent
     // - above 0.9 all browsers intersecting events may not work as expected
     const factor = 0.75;
     let height = this.clientHeight - this._tabHeight;
