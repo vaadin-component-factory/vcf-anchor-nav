@@ -287,12 +287,14 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       this._updateSelected();
     };
     this.sections.forEach((element, i) => {
-      const options = {
-        root: this,
-        threshold: this._getIntersectionThreshold(element.clientHeight, i)
-      };
-      const observer = new IntersectionObserver(callback, options);
-      observer.observe(element);
+      if (element.clientHeight) {
+        const options = {
+          root: this,
+          threshold: this._getIntersectionThreshold(element.clientHeight, i)
+        };
+        const observer = new IntersectionObserver(callback, options);
+        observer.observe(element);
+      }
     });
   }
 
