@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes" />
     <title>vcf-anchor-nav demo</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet" />
-    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
     <script type="module" src="demo.js"></script>
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
@@ -15,14 +15,54 @@
         }
 
         h1.main {
+          display: flex;
+          align-items: center;
           padding: 0 0 var(--lumo-space-l) var(--lumo-space-m);
+        }
+
+        h1.main img {
+          margin: 0 var(--lumo-space-m) 0 auto;
+          height: var(--lumo-size-m);
+          filter: grayscale(100);
+          transition: filter 0.5s;
+        }
+
+        h1.main code.main {
+          padding: 0;
+          border-radius: 0;
+          background-color: transparent;
+        }
+
+        h1.main code.main span {
+          display: inline-block;
+          font-size: var(--lumo-size-m);
+          padding: var(--lumo-space-xs);
+          vertical-align: middle;
+        }
+
+        h1.main a code {
+          background-color: transparent;
+          color: var(--lumo-secondary-text-color);
+          transition: text-decoration 0.5s, color 0.5s;
+        }
+
+        h1.main a code:hover {
+          text-decoration: underline;
+        }
+
+        h1.main:hover img {
+          filter: grayscale(0);
+        }
+
+        h1.main:hover a code {
+          color: var(--lumo-primary-text-color);
         }
 
         h2.main {
           padding: var(--lumo-space-l) 0 var(--lumo-space-l) var(--lumo-space-m);
         }
 
-        vcf-anchor-nav.main {
+        vcf-anchor-nav {
           opacity: 1;
           transition: opacity 0.5s;
           --anchor-nav-inner-max-width: 1000px;
@@ -38,11 +78,8 @@
           background-color: var(--lumo-base-color);
         }
 
-        #api vaadin-button {
-          cursor: pointer;
-        }
-
-        .hidden {
+        .hidden,
+        .hidden * {
           opacity: 0;
         }
 
@@ -50,12 +87,21 @@
           max-width: 1000px;
         }
 
-        .nav {
+        .nav-btn {
           margin: var(--lumo-space-l) var(--lumo-space-m) var(--lumo-space-l) calc(var(--lumo-button-size) * -1 / 6);
+          cursor: pointer;
+        }
+
+        code {
+          display: inline-block;
+          padding: 2px 4px;
+          background-color: var(--lumo-shade-10pct);
+          border-radius: var(--lumo-border-radius);
+          font-family: 'Fira Code', monospace;
         }
 
       </style>
-      <style id="demoSnippetStyles">
+      <style id="codeContainerStyles">
         #copyButton {
           display: none;
         }
@@ -76,7 +122,7 @@
           z-index: 1;
         }
 
-        .code code {
+        .code code:not(.main) {
           font-family: 'Fira Code', monospace;
           font-size: 12px;
         }
@@ -104,14 +150,22 @@
   <body>
     <vcf-anchor-nav fullscreen class="main hidden">
       <a id="api" slot="header" href="/api/#/elements/Vaadin.VcfAnchorNav">
-        <vaadin-button theme="tertiary" class="nav hidden">
+        <vaadin-button theme="tertiary" class="nav-btn">
           <iron-icon icon="lumo:angle-right" slot="suffix"></iron-icon>
           API
         </vaadin-button>
       </a>
-      <h1 slot="header" class="main hidden"><code class="main">&lt;vcf-anchor-nav&gt;</code></h1>
+      <h1 slot="header" class="main">
+        <code class="main">
+          <span>&lt;</span>vcf-anchor-nav<span>&gt;</span>
+        </code>
+        <img src="vaadin-logo.svg" />
+        <a href="https://vaadin.com/directory/component/anchor-nav-for-flow" title="The server-side (Java) API of this web component for the Vaadin Platform">
+          <code>Anchor Nav</code>
+        </a>
+      </h1>
       <vcf-anchor-nav-section id="basic-example" name="Basic">
-        <h2 slot="header" class="main hidden">Basic</h2>
+        <h2 slot="header" class="main">Basic</h2>
         <demo-snippet>
           <template>
             <style>
@@ -164,7 +218,7 @@
         </demo-snippet>
       </vcf-anchor-nav-section>
       <vcf-anchor-nav-section id="fullscreen-example" name="Fullscreen">
-        <h2 slot="header" class="main hidden">Fullscreen</h2>
+        <h2 slot="header" class="main">Fullscreen</h2>
         <demo-snippet>
           <template>
             <style>

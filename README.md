@@ -12,9 +12,7 @@ Web Component for easily creating layouts with sticky anchor navigation tabs and
 
 ![GIF for Vaadin Component Factory anchor nav](https://user-images.githubusercontent.com/3392815/86610834-8be1b700-bfb6-11ea-8009-59fe01c75c28.gif)
 
-[Live demo ↗](https://vcf-anchor-nav.netlify.com)
-|
-[API documentation ↗](https://vcf-anchor-nav.netlify.com/api/#/elements/Vaadin.VcfAnchorNav)
+[Live demo ↗](https://vcf-anchor-nav.netlify.com) | [API documentation ↗](https://vcf-anchor-nav.netlify.com/api/#/elements/Vaadin.VcfAnchorNav)
 
 ## Installation
 
@@ -57,12 +55,6 @@ Add `<vcf-anchor-nav>` element and `<vcf-anchor-nav-section>`s to the page.
 
 This is the client-side (Polymer 3) web component. If you are looking for the server-side (Java) API for the Vaadin Platform, it can be found here: [Anchor Nav](https://vaadin.com/directory/component/anchor-nav-for-flow)
 
-## Vaadin Prime
-
-This component is available in the Vaadin Prime subscription. It is still open source, but you need to have a valid CVAL license in order to use it. Read more at: [Pricing](https://vaadin.com/pricing)
-
 ## License
 
-Commercial Vaadin Add-on License version 3 (CVALv3). For license terms, see: [LICENSE](https://github.com/vaadin-component-factory/vcf-anchor-nav/blob/master/LICENSE)
-
-Vaadin collects development time usage statistics to improve this product. For details and to opt-out, see: [Vaadin Usage Statistics](https://github.com/vaadin/vaadin-usage-statistics)
+Apache License 2.0
