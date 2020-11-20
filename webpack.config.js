@@ -20,6 +20,10 @@ const assets = [
   {
     from: resolve('./demo/favicon.ico'),
     to: OUTPUT_PATH
+  },
+  {
+    from: resolve('./demo/vaadin-logo.svg'),
+    to: OUTPUT_PATH
   }
 ];
 
