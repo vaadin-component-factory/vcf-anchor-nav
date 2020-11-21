@@ -13,12 +13,16 @@ window.addEventListener('WebComponentsReady', () => {
   document.querySelectorAll('.hidden').forEach(element => element.classList.remove('hidden'));
   document.querySelectorAll('demo-snippet').forEach(element => {
     const codeContainer = element.shadowRoot.querySelector('.code-container');
+    const code = codeContainer.querySelector('#code');
+    const copyButton = codeContainer.querySelector('#copyButton');
     if (window.innerWidth > 768) {
       const codeContainerStyles = document.createElement('style');
-      const copyButton = codeContainer.querySelector('#copyButton');
       const copyVaadinButton = document.createElement('vaadin-button');
       const copyIcon = document.createElement('iron-icon');
-      // Copy <vaadin-button>
+      // Custom <demo-snippet> styles
+      element.shadowRoot.appendChild(codeContainerStyles);
+      codeContainerStyles.innerHTML = mainCodeContainerStyles.innerHTML;
+      // Custom <demo-snippet> Copy <vaadin-button>
       copyVaadinButton.id = 'copyVaadinButton';
       copyVaadinButton.setAttribute('theme', 'icon');
       copyVaadinButton.setAttribute('title', 'Copy to clipboard');
@@ -31,9 +35,10 @@ window.addEventListener('WebComponentsReady', () => {
         copyIcon.setAttribute('icon', 'lumo:checkmark');
       });
       copyIcon.setAttribute('icon', 'vcf-demo:copy');
-      element.shadowRoot.appendChild(codeContainerStyles);
-      codeContainerStyles.innerHTML = mainCodeContainerStyles.innerHTML;
       codeContainer.appendChild(copyVaadinButton);
-    } else codeContainer.style.display = 'none';
+    } else {
+      code.innerHTML = 'View demo code on a larger screen';
+      copyButton.style.display = 'none';
+    }
   });
 });
