@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes" />
     <title>vcf-anchor-nav demo</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet" />
-    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-    <script type="module" src="demo.js"></script>
+    <script dev src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script dev type="module" src="demo.js"></script>
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
         body {
@@ -20,46 +20,20 @@
           padding: 0 0 var(--lumo-space-l) var(--lumo-space-m);
         }
 
-        h1.main img {
-          margin: 0 var(--lumo-space-m) 0 auto;
-          height: var(--lumo-size-m);
-          filter: grayscale(100);
-          transition: filter 0.5s;
-        }
-
-        h1.main code.main {
-          padding: 0;
-          border-radius: 0;
-          background-color: transparent;
-        }
-
-        h1.main code.main span {
-          display: inline-block;
-          font-size: var(--lumo-size-m);
-          padding: var(--lumo-space-xs);
-          vertical-align: middle;
-        }
-
-        h1.main a code {
-          background-color: transparent;
-          color: var(--lumo-secondary-text-color);
-          transition: text-decoration 0.5s, color 0.5s;
-        }
-
-        h1.main a code:hover {
-          text-decoration: underline;
-        }
-
-        h1.main:hover img {
-          filter: grayscale(0);
-        }
-
-        h1.main:hover a code {
+        h1.main:hover a {
           color: var(--lumo-primary-text-color);
         }
 
         h2.main {
           padding: var(--lumo-space-l) 0 var(--lumo-space-l) var(--lumo-space-m);
+        }
+
+        code {
+          display: inline-block;
+          padding: 2px 4px;
+          background-color: var(--lumo-shade-10pct);
+          border-radius: var(--lumo-border-radius);
+          font-family: 'Fira Code', monospace;
         }
 
         vcf-anchor-nav {
@@ -78,6 +52,49 @@
           background-color: var(--lumo-base-color);
         }
 
+        vcf-anchor-nav.main vcf-anchor-nav-section:last-of-type {
+          min-height: calc(100vh - var(--lumo-size-l));
+        }
+
+        #elementName {
+          padding: 0;
+          border-radius: 0;
+          background-color: transparent;
+        }
+
+        #elementName span {
+          display: inline-block;
+          font-size: var(--lumo-size-m);
+          padding: var(--lumo-space-xs);
+          vertical-align: middle;
+        }
+
+        #javaApi {
+          margin: 0 var(--lumo-space-m) 0 auto;
+          display: inline-flex;
+          align-items: center;
+        }
+
+        #javaApi code {
+          display: none;
+          font-size: var(--lumo-font-size-xxs);
+          margin-right: var(--lumo-space-m);
+          background: none;
+        }
+
+        #javaApi a {
+          color: var(--lumo-secondary-text-color);
+          transition: text-decoration 0.5s, color 0.5s;
+          font-family: var(--lumo-font-family);
+          font-weight: normal;
+          margin-right: var(--lumo-space-m);
+          text-decoration: none;
+        }
+
+        #javaApi a:hover {
+          text-decoration: underline;
+        }
+
         .hidden,
         .hidden * {
           opacity: 0;
@@ -92,12 +109,26 @@
           cursor: pointer;
         }
 
-        code {
-          display: inline-block;
-          padding: 2px 4px;
-          background-color: var(--lumo-shade-10pct);
-          border-radius: var(--lumo-border-radius);
-          font-family: 'Fira Code', monospace;
+        @media only screen and (max-width: 768px) {
+          h1.main {
+            align-items: flex-start;
+            flex-direction: column;
+            margin-top: 0;
+          }
+
+          #elementName,
+          #elementName span {
+            font-size: var(--lumo-font-size-xl);
+          }
+
+          #javaApi {
+            margin: 0;
+            font-size: var(--lumo-font-size-xs);
+          }
+
+          #javaApi code {
+            display: inline-block;
+          }
         }
 
       </style>
@@ -132,18 +163,6 @@
           overflow-y: scroll;
         }
 
-        .overflow:not(.top) {
-          box-shadow: inset 0 8px 10px -15px #000;
-        }
-
-        .overflow:not(.top):not(.bottom) {
-          box-shadow: inset 0 8px 10px -15px #000, inset 0 -12px 15px -20px #000;
-        }
-
-        .overflow:not(.bottom) {
-          box-shadow: inset 0 -12px 15px -20px #000;
-        }
-
       </style>
     </custom-style>
   </head>
@@ -156,13 +175,11 @@
         </vaadin-button>
       </a>
       <h1 slot="header" class="main">
-        <code class="main">
-          <span>&lt;</span>vcf-anchor-nav<span>&gt;</span>
-        </code>
-        <img src="vaadin-logo.svg" />
-        <a href="https://vaadin.com/directory/component/anchor-nav-for-flow" title="The server-side (Java) API of this web component for the Vaadin Platform">
-          <code>Anchor Nav</code>
-        </a>
+        <code id="elementName"><span>&lt;</span>vcf-anchor-nav<span>&gt;</span></code>
+        <span id="javaApi">
+          <code>-></code>
+          <a href="https://vaadin.com/directory/component/anchor-nav-for-flow" title="The server-side (Java) API of this web component for the Vaadin Platform">AnchorNav</a>
+        </span>
       </h1>
       <vcf-anchor-nav-section id="basic-example" name="Basic">
         <h2 slot="header" class="main">Basic</h2>
