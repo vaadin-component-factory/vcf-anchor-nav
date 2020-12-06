@@ -215,7 +215,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     this.$.tabs.innerHTML = '';
     if (this.sections.length) {
       this.sections.forEach((section, i) => {
-        const path = this._getAnchorHref();
+        const url = `${location.pathname}#${section.id}`;
         const tab = document.createElement('vaadin-tab');
         const a = document.createElement('a');
         section.name = section.name || `Section ${i + 1}`;
@@ -227,13 +227,13 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
             .toLowerCase();
         a.innerText = section.name;
         a.id = `${section.id}-anchor`;
-        a.href = `${path}#${section.id}`;
+        a.href = url;
         a.addEventListener('click', e => e.preventDefault());
         tab.id = `${section.id}-tab`;
         tab.appendChild(a);
         tab.addEventListener('click', () => {
           this._scrollToSection(section.id);
-          history.pushState(null, null, `${path}#${section.id}`);
+          history.pushState(null, this._getTitle(section), url);
         });
         this.$.tabs.appendChild(tab);
       });
@@ -242,9 +242,8 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     }
   }
 
-  _getAnchorHref() {
-    const end = location.pathname.length - 1;
-    return location.pathname[end] === '/' ? location.pathname : location.pathname + '/';
+  _getTitle(section) {
+    return `${document.title}${document.title ? ` | ${section.name}` : section.name}`;
   }
 
   _scrollToHash() {
