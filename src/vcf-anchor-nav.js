@@ -133,7 +133,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   static get version() {
-    return '1.1.2';
+    return '1.1.3';
   }
 
   static get properties() {
@@ -215,9 +215,6 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     this.$.tabs.innerHTML = '';
     if (this.sections.length) {
       this.sections.forEach((section, i) => {
-        const url = `${location.pathname}#${section.id}`;
-        const tab = document.createElement('vaadin-tab');
-        const a = document.createElement('a');
         section.name = section.name || `Section ${i + 1}`;
         section.id =
           section.id ||
@@ -225,6 +222,9 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
             .replace(/[^a-zA-Z0-9- ]/g, '')
             .replace(/ /g, '-')
             .toLowerCase();
+        const url = `${location.pathname}#${section.id}`;
+        const tab = document.createElement('vaadin-tab');
+        const a = document.createElement('a');
         a.innerText = section.name;
         a.id = `${section.id}-anchor`;
         a.href = url;
