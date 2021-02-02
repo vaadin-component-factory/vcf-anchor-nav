@@ -222,12 +222,13 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
             .replace(/[^a-zA-Z0-9- ]/g, '')
             .replace(/ /g, '-')
             .toLowerCase();
-        const url = `${location.pathname}#${section.id}`;
+        const url = new URL(location);
         const tab = document.createElement('vaadin-tab');
         const a = document.createElement('a');
+        url.hash = `#${section.id}`;
         a.innerText = section.name;
         a.id = `${section.id}-anchor`;
-        a.href = url;
+        a.href = url.toString();
         a.addEventListener('click', e => e.preventDefault());
         tab.id = `${section.id}-tab`;
         tab.appendChild(a);
