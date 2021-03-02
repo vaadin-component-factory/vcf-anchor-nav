@@ -185,14 +185,6 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     return this.$.slot.assignedNodes().filter(node => node.tagName === 'VCF-ANCHOR-NAV-SECTION');
   }
 
-  /**
-   * Returns the last section.
-   * @returns {VcfAnchorNavSection}
-   */
-  get last() {
-    return this.sections[this.sections.length - 1];
-  }
-
   get _tabHeight() {
     return this._verticalTabs ? 0 : this.$.tabs.clientHeight;
   }
@@ -339,7 +331,14 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     return i;
   }
 
+  _getSectionId(sectionIndex) {
+    const tab = this.$.tabs.querySelectorAll('vaadin-tab')[sectionIndex] || '';
+    return tab && tab.id.substring(0, tab.id.length - 4);
+  }
+
   _scrollToSection(sectionId) {
+    // Accept both section id or index
+    if (typeof sectionId === 'number') sectionId = this._getSectionId(sectionId);
     const section = sectionId && this.querySelector(`#${sectionId}`);
     if (section) {
       this.scrollTo({
@@ -358,8 +357,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   _selectedIndexChanged(selectedIndex) {
-    const tab = this.$.tabs.querySelectorAll('vaadin-tab')[selectedIndex] || '';
-    const selectedId = tab && tab.id.substring(0, tab.id.length - 4);
+    const selectedId = this._getSectionId(selectedIndex);
     if (this.selectedId !== selectedId) {
       this._selectTab(selectedId);
       this.selectedId = selectedId;
