@@ -117,7 +117,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         }
 
         :host([theme~='expand-last']) ::slotted(vcf-anchor-nav-section:last-of-type) {
-          min-height: calc(100vh - var(--lumo-size-l));
+          min-height: calc(var(--_height) - var(--_tab-height));
         }
       </style>
       <div id="container" part="container">
@@ -189,6 +189,10 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     return this._verticalTabs ? 0 : this.$.tabs.clientHeight;
   }
 
+  get _deepLinks() {
+    return !this.disablePreserveOnRefresh;
+  }
+
   ready() {
     super.ready();
     smoothScrollPolyfill();
@@ -201,6 +205,8 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
       this._scrollToHash();
     });
     this._verticalTabs = false;
+    this.style.setProperty('--_tab-height', `${this._tabHeight}px`);
+    this.style.setProperty('--_height', `${this.clientHeight}px`);
   }
 
   _onSlotChange() {
@@ -220,18 +226,18 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
         url.hash = `#${section.id}`;
         a.innerText = section.name;
         a.id = `${section.id}-anchor`;
-        a.href = url.toString();
+        if (this._deepLinks) a.href = url.toString();
         a.addEventListener('click', e => e.preventDefault());
         tab.id = `${section.id}-tab`;
         tab.appendChild(a);
         tab.addEventListener('click', () => {
           this._scrollToSection(section.id);
-          history.pushState(null, this._getTitle(section), url);
+          if (this._deepLinks) history.pushState(null, this._getTitle(section), url);
         });
         this.$.tabs.appendChild(tab);
       });
       this._initTabHighlight();
-      if (!this.disablePreserveOnRefresh) this._scrollToHash();
+      if (this._deepLinks) this._scrollToHash();
     }
   }
 
@@ -264,21 +270,24 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
 
   _initTabHighlight() {
     const callback = (entries, observer) => {
-      const lastEntry = entries[entries.length - 1];
-      // Threshold comparison required for Firefox
-      lastEntry.target.isIntersecting = lastEntry.isIntersecting && lastEntry.intersectionRatio >= observer.thresholds[0];
-      this._updateSelected();
+      if (this._observeIntersections) {
+        const lastEntry = entries[entries.length - 1];
+        // Threshold comparison required for Firefox
+        lastEntry.target.isIntersecting = lastEntry.isIntersecting && lastEntry.intersectionRatio >= observer.thresholds[0];
+        this._updateSelected();
+      }
     };
     this.sections.forEach((element, i) => {
       if (element.clientHeight) {
         const options = {
           root: this,
-          threshold: this._getIntersectionThreshold(element.clientHeight, i)
+          threshold: this._getIntersectionThreshold(element.clientHeight)
         };
         const observer = new IntersectionObserver(callback, options);
         observer.observe(element);
       }
     });
+    this._observeIntersections = true;
   }
 
   _initTabsStuckAttribute() {
@@ -296,7 +305,7 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     if (firstIntersecting) this.selectedIndex = this._getTabIndex(firstIntersecting.id);
   }
 
-  _getIntersectionThreshold(sectionHeight, index) {
+  _getIntersectionThreshold(sectionHeight) {
     // This factor value can be adjusted, however
     // - below 0.7 in Firefox intersecting events are inconsistent
     // - above 0.9 all browsers intersecting events may not work as expected
@@ -341,7 +350,8 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     if (typeof sectionId === 'number') sectionId = this._getSectionId(sectionId);
     const section = sectionId && this.querySelector(`#${sectionId}`);
     if (section) {
-      this.scrollTo({
+      section.focus({ preventScroll: true });
+      section.scrollTop = this.scrollTo({
         top: section.offsetTop - this._tabHeight,
         behavior: 'smooth'
       });

@@ -47,12 +47,12 @@
           z-index: 2;
         }
 
-        vcf-anchor-nav.main vcf-anchor-nav-section {
+        vcf-anchor-nav.main > vcf-anchor-nav-section {
           height: auto;
           background-color: var(--lumo-base-color);
         }
 
-        vcf-anchor-nav.main vcf-anchor-nav-section:last-of-type {
+        vcf-anchor-nav.main > vcf-anchor-nav-section:last-of-type {
           min-height: calc(100vh - var(--lumo-size-l));
         }
 
@@ -130,7 +130,6 @@
             display: inline-block;
           }
         }
-
       </style>
       <style id="codeContainerStyles">
         #copyButton {
@@ -162,7 +161,6 @@
           overflow-x: hidden;
           overflow-y: scroll;
         }
-
       </style>
     </custom-style>
   </head>
@@ -178,7 +176,12 @@
         <code id="elementName"><span>&lt;</span>vcf-anchor-nav<span>&gt;</span></code>
         <span id="javaApi">
           <code>-></code>
-          <a href="https://vaadin.com/directory/component/anchor-nav-for-flow" title="The server-side (Java) API of this web component for the Vaadin Platform">AnchorNav</a>
+          <a
+            href="https://vaadin.com/directory/component/anchor-nav-for-flow"
+            title="The server-side (Java) API of this web component for the Vaadin Platform"
+          >
+            AnchorNav
+          </a>
         </span>
       </h1>
       <vcf-anchor-nav-section id="basic-example" name="Basic">
@@ -190,16 +193,15 @@
                 height: 50vh;
               }
 
-              #basic vcf-anchor-nav-section {
+              #basic vcf-anchor-nav-section:not(:last-of-type) {
                 height: 50vh;
               }
 
               #basic vcf-anchor-nav-section:nth-child(even) {
                 background-color: var(--lumo-contrast-5pct);
               }
-
             </style>
-            <vcf-anchor-nav id="basic">
+            <vcf-anchor-nav id="basic" theme="expand-last">
               <h1 slot="header">Main Header</h1>
               <vcf-anchor-nav-section name="Introduction">
                 Scroll down to see:
@@ -256,7 +258,6 @@
                 height: 50vh;
                 --anchor-nav-section-border-width: 1px;
               }
-
             </style>
             <vcf-anchor-nav id="fullscreen" theme="expand-last">
               <vaadin-button slot="header">Toggle Fullscreen</vaadin-button>

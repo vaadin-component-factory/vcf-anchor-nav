@@ -36,25 +36,13 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
     return 'vcf-anchor-nav-section';
   }
 
-  static get properties() {
-    return {
-      /**
-       * Used to set corresponding tab label and default header text.
-       * If not set defaults to "Section <index>".
-       * @type {String}
-       */
-      name: {
-        type: String
-      }
-    };
-  }
-
   static get template() {
     return html`
       <style>
         :host {
           --anchor-nav-section-border-width: 0;
           --anchor-nav-section-border-color: var(--lumo-contrast-10pct);
+          outline: none;
         }
 
         :host(:not(:last-of-type)) {
@@ -80,6 +68,38 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
         <slot></slot>
       </div>
     `;
+  }
+
+  static get properties() {
+    return {
+      /**
+       * Used to set corresponding tab label and default header text.
+       * If not set defaults to "Section <index>".
+       * @type {String}
+       */
+      name: {
+        type: String,
+        observer: '_nameChanged'
+      }
+    };
+  }
+
+  ready() {
+    super.ready();
+    this.setAttribute('tabindex', '-1');
+  }
+
+  get _tab() {
+    const tabs = this.parentElement.shadowRoot.querySelector('[part="tabs"]');
+    return tabs.querySelector(`#${this.id}-tab`);
+  }
+
+  _nameChanged(name) {
+    const tab = this._tab;
+    if (tab) {
+      const a = tab.querySelector('a');
+      a.innerText = name;
+    }
   }
 }
 
