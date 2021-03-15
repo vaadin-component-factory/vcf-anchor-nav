@@ -261,7 +261,8 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
     const observer = new ResizeObserver(() => {
       this._initTabHighlight();
       if (this.selectedId && firstResize) {
-        this.scrollTo({ top: this.querySelector(`#${this.selectedId}`).offsetTop - this._tabHeight });
+        const section = this.querySelector(`#${this.selectedId}`);
+        if (section) this.scrollTo({ top: section.offsetTop - this._tabHeight });
         firstResize = false;
       }
     });
