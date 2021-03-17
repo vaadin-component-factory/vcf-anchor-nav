@@ -109,7 +109,8 @@
   "files": [
     "lib",
     "src",
-    "theme"
+    "theme",
+    "vcf-anchor-nav.js"
   ],
   "homepage": "https://github.com/vaadin-component-factory/vcf-anchor-nav#readme",
   "directories": {
