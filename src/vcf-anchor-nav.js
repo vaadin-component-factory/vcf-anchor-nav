@@ -47,7 +47,7 @@ import '@vaadin/vaadin-tabs/vaadin-tab';
  * @mixes ThemableMixin
  * @demo demo/index.html
  */
-class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
+export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)) {
   static get template() {
     return html`
       <style>
@@ -385,9 +385,9 @@ class VcfAnchorNav extends ElementMixin(ThemableMixin(PolymerElement)) {
    */
 }
 
-customElements.define(VcfAnchorNav.is, VcfAnchorNav);
+customElements.define(AnchorNavElement.is, AnchorNavElement);
 
 /**
  * @namespace Vaadin
  */
-window.Vaadin.VcfAnchorNav = VcfAnchorNav;
+window.Vaadin.AnchorNavElement = AnchorNavElement;
