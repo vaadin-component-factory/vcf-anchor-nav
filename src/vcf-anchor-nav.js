@@ -94,9 +94,13 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         [part='tabs'] {
           position: -webkit-sticky;
           position: sticky;
-          top: -1px !important;
+          top: 0 !important;
           background: var(--lumo-base-color);
           z-index: 1;
+        }
+
+        :host([has-header]) [part='tabs'] {
+          top: -1px !important;
         }
 
         [part='tabs'][stuck]::after {
@@ -119,9 +123,21 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         :host([theme~='expand-last']) ::slotted(vcf-anchor-nav-section:last-of-type) {
           min-height: calc(var(--_height) - var(--_tab-height));
         }
+
+        vaadin-tab a > vaadin-button {
+          height: auto;
+          margin: 0;
+          cursor: pointer;
+        }
+
+        vaadin-tab:not([selected]) a > vaadin-button {
+          color: var(--lumo-contrast-60pct);
+        }
       </style>
       <div id="container" part="container">
-        <div id="header" part="header"><slot name="header"></slot></div>
+        <div id="header" part="header">
+          <slot id="headerSlot" name="header"></slot>
+        </div>
         <vaadin-tabs id="tabs" part="tabs"></vaadin-tabs>
         <slot id="slot"></slot>
       </div>
@@ -178,11 +194,19 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   /**
-   * Returns array of the section elements.
+   * Returns array of the slotted section elements.
    * @returns {Array<VcfAnchorNavSection>}
    */
   get sections() {
     return this.$.slot.assignedNodes().filter(node => node.tagName === 'VCF-ANCHOR-NAV-SECTION');
+  }
+
+  /**
+   * Returns the slotted header element.
+   * @returns {HTMLElement}
+   */
+  get header() {
+    return this.$.headerSlot.assignedNodes()[0] || null;
   }
 
   get _tabHeight() {
@@ -199,6 +223,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     stickyPolyfill.add(this.$.tabs);
     this._initTabsStuckAttribute();
     this._initContainerResizeObserver();
+    this.$.headerSlot.addEventListener('slotchange', () => this._onHeaderSlotChange());
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
     window.addEventListener('popstate', () => {
       this._initTabHighlight();
@@ -210,35 +235,25 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _onSlotChange() {
-    this.$.tabs.innerHTML = '';
     if (this.sections.length) {
-      this.sections.forEach((section, i) => {
-        section.name = section.name || `Section ${i + 1}`;
-        section.id =
-          section.id ||
-          section.name
-            .replace(/[^a-zA-Z0-9- ]/g, '')
-            .replace(/ /g, '-')
-            .toLowerCase();
-        const url = new URL(location);
-        const tab = document.createElement('vaadin-tab');
-        const a = document.createElement('a');
-        url.hash = `#${section.id}`;
-        a.innerText = section.name;
-        a.id = `${section.id}-anchor`;
-        if (this._deepLinks) a.href = url.toString();
-        a.addEventListener('click', e => e.preventDefault());
-        tab.id = `${section.id}-tab`;
-        tab.appendChild(a);
-        tab.addEventListener('click', () => {
-          this._scrollToSection(section.id);
-          if (this._deepLinks) history.pushState(null, this._getTitle(section), url);
-        });
-        this.$.tabs.appendChild(tab);
+      this.sections.forEach(section => {
+        // Create default tab
+        let tab = section.tab;
+        if (!tab) {
+          tab = document.createElement('vaadin-tab');
+          tab.id = section.defaultTabId;
+          this.$.tabs.appendChild(tab);
+          this._initTab(tab, section);
+        }
       });
       this._initTabHighlight();
       if (this._deepLinks) this._scrollToHash();
     }
+  }
+
+  _onHeaderSlotChange() {
+    if (this.header) this.setAttribute('has-header', true);
+    else this.removeAttribute('has-header');
   }
 
   _getTitle(section) {
@@ -253,6 +268,15 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       const top = section ? section.offsetTop - this._tabHeight : 0;
       this.scrollTo({ top });
       if (section) this.selectedId = location.hash.replace('#', '');
+    });
+  }
+
+  _initTab(tab, section) {
+    tab.dataset.sectionId = section.id;
+    section._setTabAnchor(tab, section.url);
+    tab.addEventListener('click', () => {
+      this._scrollToSection(section.id);
+      if (this._deepLinks) history.pushState(null, this._getTitle(section), section.url);
     });
   }
 
@@ -293,10 +317,15 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   _initTabsStuckAttribute() {
     setTimeout(() => {
-      const observer = new IntersectionObserver(([e]) => e.target.toggleAttribute('stuck', e.intersectionRatio < 1), {
-        root: this,
-        threshold: 1
-      });
+      const observer = new IntersectionObserver(
+        ([e]) => {
+          e.target.toggleAttribute('stuck', !this.hasAttribute('has-header') || e.intersectionRatio < 1);
+        },
+        {
+          root: this,
+          threshold: 1
+        }
+      );
       observer.observe(this.$.tabs);
     });
   }
@@ -317,7 +346,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   _selectTab(sectionId) {
     this.$.tabs.querySelectorAll('vaadin-tab').forEach(tab => (tab.selected = false));
-    const tab = this.$.tabs.querySelector(`#${sectionId}-tab`);
+    const tab = this._getSectionTab(sectionId);
     if (tab) tab.selected = true;
     // Horizontally scroll tabs when selected changes
     if (this.$.tabs.hasAttribute('overflow') && this.sections.length) {
@@ -334,7 +363,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _getTabIndex(sectionId) {
-    let tab = sectionId && this.$.tabs.querySelector(`#${sectionId}-tab`);
+    let tab = this._getSectionTab(sectionId);
     let i = 0;
     if (tab) while ((tab = tab.previousSibling) !== null) i++;
     else i = this.selectedIndex;
@@ -342,8 +371,13 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _getSectionId(sectionIndex) {
-    const tab = this.$.tabs.querySelectorAll('vaadin-tab')[sectionIndex] || '';
-    return tab && tab.id.substring(0, tab.id.length - 4);
+    const tab = this.$.tabs.querySelectorAll('vaadin-tab')[sectionIndex];
+    return (tab && tab.dataset.sectionId) || '';
+  }
+
+  _getSectionTab(sectionId) {
+    const section = sectionId && this.querySelector(`#${sectionId}`);
+    return section && section.tab;
   }
 
   _scrollToSection(sectionId) {

@@ -70,14 +70,15 @@
         }
 
         #javaApi {
-          margin: 0 var(--lumo-space-m) 0 auto;
+          font-size: var(--lumo-font-size-m);
+          margin: 0 0 0 auto;
           display: inline-flex;
           align-items: center;
         }
 
         #javaApi code {
-          display: none;
-          font-size: var(--lumo-font-size-xxs);
+          display: inline-block;
+          font-size: var(--lumo-font-size-m);
           margin-right: var(--lumo-space-m);
           background: none;
         }
@@ -98,15 +99,6 @@
         .hidden,
         .hidden * {
           opacity: 0;
-        }
-
-        .centered {
-          max-width: 1000px;
-        }
-
-        .nav-btn {
-          margin: var(--lumo-space-l) var(--lumo-space-m) var(--lumo-space-l) calc(var(--lumo-button-size) * -1 / 6);
-          cursor: pointer;
         }
 
         @media only screen and (max-width: 768px) {
@@ -201,7 +193,7 @@
                 background-color: var(--lumo-contrast-5pct);
               }
             </style>
-            <vcf-anchor-nav id="basic" theme="expand-last">
+            <vcf-anchor-nav id="basic" theme="expand-last" disable-preserve-on-refresh>
               <h1 slot="header">Main Header</h1>
               <vcf-anchor-nav-section name="Introduction">
                 Scroll down to see:
@@ -259,7 +251,7 @@
                 --anchor-nav-section-border-width: 1px;
               }
             </style>
-            <vcf-anchor-nav id="fullscreen" theme="expand-last">
+            <vcf-anchor-nav id="fullscreen" theme="expand-last" disable-preserve-on-refresh>
               <vaadin-button slot="header">Toggle Fullscreen</vaadin-button>
               <vcf-anchor-nav-section>Section 1</vcf-anchor-nav-section>
               <vcf-anchor-nav-section>Section 2</vcf-anchor-nav-section>
@@ -292,6 +284,42 @@
                 });
               });
             </script>
+          </template>
+        </demo-snippet>
+      </vcf-anchor-nav-section>
+      <vcf-anchor-nav-section id="custom-tabs-example" name="Custom Tabs">
+        <h2 slot="header" class="main">Custom Tabs</h2>
+        <demo-snippet>
+          <template>
+            <style>
+              #custom-tabs {
+                height: 50vh;
+              }
+
+              #custom-tabs vcf-anchor-nav-section {
+                height: 50vh;
+              }
+
+              #custom-tabs vcf-anchor-nav-section:last-of-type {
+                height: calc(50vh - var(--_tab-height));
+              }
+            </style>
+            <vcf-anchor-nav id="custom-tabs" disable-preserve-on-refresh>
+              <vcf-anchor-nav-section>
+                <vaadin-tab id="custom-tab-1" slot="tab">
+                  Custom Tab 1
+                  <iron-icon icon="lumo:chevron-right" slot="suffix"></iron-icon>
+                </vaadin-tab>
+                Section content.
+              </vcf-anchor-nav-section>
+              <vcf-anchor-nav-section>
+                <vaadin-tab id="custom-tab-2" slot="tab">
+                  Custom Tab 2
+                  <iron-icon icon="lumo:arrow-left" slot="prefix"></iron-icon>
+                </vaadin-tab>
+                Section content.
+              </vcf-anchor-nav-section>
+            </vcf-anchor-nav>
           </template>
         </demo-snippet>
       </vcf-anchor-nav-section>
