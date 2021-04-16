@@ -341,7 +341,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     // - above 0.9 all browsers intersecting events may not work as expected
     const factor = 0.75;
     const height = this.clientHeight - this._tabHeight;
-    return sectionHeight >= height ? (height / sectionHeight) * factor : 1;
+    return height > 0 && sectionHeight >= height ? (height / sectionHeight) * factor : 1;
   }
 
   _selectTab(sectionId) {
