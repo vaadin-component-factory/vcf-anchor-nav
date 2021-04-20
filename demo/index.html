@@ -303,21 +303,47 @@
               #custom-tabs vcf-anchor-nav-section:last-of-type {
                 height: calc(50vh - var(--_tab-height));
               }
+
+              #custom-tabs::part(tab-content) {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+              }
             </style>
             <vcf-anchor-nav id="custom-tabs" disable-preserve-on-refresh>
               <vcf-anchor-nav-section>
-                <vaadin-tab id="custom-tab-1" slot="tab">
+                <vaadin-tab slot="tab">
                   Custom Tab 1
-                  <iron-icon icon="lumo:chevron-right" slot="suffix"></iron-icon>
+                  <iron-icon icon="lumo:chevron-right"></iron-icon>
                 </vaadin-tab>
-                Section content.
+                Section 1 content.
               </vcf-anchor-nav-section>
               <vcf-anchor-nav-section>
-                <vaadin-tab id="custom-tab-2" slot="tab">
+                <vaadin-tab slot="tab">
+                  <iron-icon icon="lumo:chevron-left"></iron-icon>
                   Custom Tab 2
-                  <iron-icon icon="lumo:arrow-left" slot="prefix"></iron-icon>
                 </vaadin-tab>
-                Section content.
+                Section 2 content.
+              </vcf-anchor-nav-section>
+              <vcf-anchor-nav-section>
+                <vaadin-tab slot="tab">
+                  <!-- Note the slotted tabs are moved to the shadow dom (tabs part) -->
+                  <!-- Use "part" attribute to target with external CSS -->
+                  <div part="tab-content">
+                    <iron-icon icon="lumo:chevron-up"></iron-icon>
+                    Custom Tab 3
+                  </div>
+                </vaadin-tab>
+                Section 3 content.
+              </vcf-anchor-nav-section>
+              <vcf-anchor-nav-section>
+                <vaadin-tab slot="tab">
+                  <div part="tab-content">
+                    Custom Tab 4
+                    <iron-icon icon="lumo:chevron-down"></iron-icon>
+                  </div>
+                </vaadin-tab>
+                Section 4 content.
               </vcf-anchor-nav-section>
             </vcf-anchor-nav>
           </template>

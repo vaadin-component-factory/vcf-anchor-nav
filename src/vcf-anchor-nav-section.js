@@ -165,16 +165,12 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
   _setTabAnchor(tab, url) {
     let a = tab.querySelector('a');
     if (!a && this.nav) {
-      const btn = document.createElement('vaadin-button');
-      btn.setAttribute('theme', 'tertiary');
-      btn.innerText = tab.innerText || this.name;
-      Array.from(tab.children).forEach(el => btn.appendChild(el));
       a = document.createElement('a');
+      Array.from(tab.childNodes).forEach(node => a.appendChild(node));
       a.id = `${this.id}-anchor`;
-      tab.innerText = '';
+      if (!a.innerText) a.innerText = this.name;
       if (this.nav._deepLinks) a.href = url.toString();
       a.addEventListener('click', e => e.preventDefault());
-      a.appendChild(btn);
       tab.appendChild(a);
       return a;
     }

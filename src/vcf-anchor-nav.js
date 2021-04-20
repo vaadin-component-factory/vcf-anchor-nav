@@ -123,16 +123,6 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         :host([theme~='expand-last']) ::slotted(vcf-anchor-nav-section:last-of-type) {
           min-height: calc(var(--_height) - var(--_tab-height));
         }
-
-        vaadin-tab a > vaadin-button {
-          height: auto;
-          margin: 0;
-          cursor: pointer;
-        }
-
-        vaadin-tab:not([selected]) a > vaadin-button {
-          color: var(--lumo-contrast-60pct);
-        }
       </style>
       <div id="container" part="container">
         <div id="header" part="header">
@@ -241,7 +231,6 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         let tab = section.tab;
         if (!tab) {
           tab = document.createElement('vaadin-tab');
-          tab.id = section.defaultTabId;
           this.$.tabs.appendChild(tab);
           this._initTab(tab, section);
         }
@@ -272,6 +261,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _initTab(tab, section) {
+    tab.id = tab.id || section.defaultTabId;
+    tab.setAttribute('part', 'tab');
     tab.dataset.sectionId = section.id;
     section._setTabAnchor(tab, section.url);
     tab.addEventListener('click', () => {
