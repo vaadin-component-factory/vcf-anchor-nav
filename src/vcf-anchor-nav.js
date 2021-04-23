@@ -236,7 +236,10 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         }
       });
       this._initTabHighlight();
-      if (this._deepLinks) this._scrollToHash();
+      if (this.selectedId) this._scrollToSection(this.selectedId);
+      else if (this._deepLinks) this._scrollToHash();
+      // Dispatch sections-ready event
+      this.dispatchEvent(new CustomEvent('sections-ready', { detail: this.sections }));
     }
   }
 
@@ -323,7 +326,15 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   _updateSelected() {
     const firstIntersecting = this.sections.filter(i => i.isIntersecting)[0];
-    if (firstIntersecting) this.selectedIndex = this._getTabIndex(firstIntersecting.id);
+    if (firstIntersecting) {
+      if (!this._firstUpdate) {
+        // Prevent overwriting selected index on first update
+        if (!this.selectedId && !this.selectedIndex) this.selectedIndex = this._getTabIndex(firstIntersecting.id);
+        this._firstUpdate = true;
+      } else {
+        this.selectedIndex = this._getTabIndex(firstIntersecting.id);
+      }
+    }
   }
 
   _getIntersectionThreshold(sectionHeight) {
@@ -362,8 +373,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _getSectionId(sectionIndex) {
-    const tab = this.$.tabs.querySelectorAll('vaadin-tab')[sectionIndex];
-    return (tab && tab.dataset.sectionId) || '';
+    return this.sections[sectionIndex].id;
   }
 
   _getSectionTab(sectionId) {
