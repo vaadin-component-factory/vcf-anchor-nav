@@ -420,7 +420,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   _scrollToWithCallback(offset, callback) {
     const fixedOffset = offset.toFixed();
     const onScroll = () => {
-      if (this.pageYOffset.toFixed() === fixedOffset) {
+      if (window.pageYOffset.toFixed() === fixedOffset) {
         this.removeEventListener('scroll', onScroll);
         callback();
       }
