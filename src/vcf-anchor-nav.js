@@ -190,7 +190,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   /**
    * Returns array of the slotted section elements.
-   * @returns {Array<VcfAnchorNavSection>}
+   * @returns {Array<AnchorNavSectionElement>}
    */
   get sections() {
     const slot = this.shadowRoot && this.shadowRoot.querySelector('#slot');
@@ -419,31 +419,17 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     return sectionIndex < this.sections.length && this.sections[sectionIndex].id;
   }
 
-  _scrollToWithCallback(offset, callback) {
-    const fixedOffset = offset.toFixed();
-    const onScroll = () => {
-      if (window.pageYOffset.toFixed() === fixedOffset) {
-        this.removeEventListener('scroll', onScroll);
-        callback();
-      }
-    };
-    this.addEventListener('scroll', onScroll);
-    onScroll();
-    return this.scrollTo({
-      top: offset,
-      behavior: 'smooth'
-    });
-  }
-
   _scrollToSection(sectionIndex) {
     let sectionId = this._getSectionId(sectionIndex);
     // Accept both section index or id
     if (typeof sectionIndex === 'string') sectionId = sectionIndex;
     const section = sectionId && this.querySelector(`#${sectionId}`);
     if (section) {
-      const offset = section.offsetTop - this._tabHeight;
       section.focus({ preventScroll: true });
-      section.scrollTop = this._scrollToWithCallback(offset, () => this._selectTab(section));
+      section.scrollTop = this.scrollTo({
+        top: section.offsetTop - this._tabHeight,
+        behavior: 'smooth'
+      });
     }
   }
 
@@ -471,7 +457,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
    *
    * @event sections-ready
    * @param {Object} detail
-   * @param {Array<VcfAnchorNavSection>} detail.sections Array of sections.
+   * @param {Array<AnchorNavSectionElement>} detail.sections Array of sections.
    */
 
   /**
