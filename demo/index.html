@@ -193,8 +193,10 @@
                 background-color: var(--lumo-contrast-5pct);
               }
             </style>
+
             <vcf-anchor-nav id="basic" theme="expand-last" disable-preserve-on-refresh>
               <h1 slot="header">Main Header</h1>
+
               <vcf-anchor-nav-section name="Introduction">
                 Scroll down to see:
                 <ul>
@@ -251,12 +253,14 @@
                 --anchor-nav-section-border-width: 1px;
               }
             </style>
+
             <vcf-anchor-nav id="fullscreen" theme="expand-last" disable-preserve-on-refresh>
               <vaadin-button slot="header">Toggle Fullscreen</vaadin-button>
               <vcf-anchor-nav-section>Section 1</vcf-anchor-nav-section>
               <vcf-anchor-nav-section>Section 2</vcf-anchor-nav-section>
               <vcf-anchor-nav-section>Section 3</vcf-anchor-nav-section>
             </vcf-anchor-nav>
+
             <script>
               window.addEventListener('WebComponentsReady', () => {
                 // Set section height to avoid resize calculations
@@ -304,28 +308,33 @@
                 height: calc(50vh - var(--_tab-height));
               }
 
-              .tab-content {
+              .vertical-tab {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
               }
             </style>
+
             <vcf-anchor-nav id="custom-tabs" disable-preserve-on-refresh>
+              <!-- Add your own <vaadin-tabs> to the "tabs" slot. -->
               <vaadin-tabs slot="tabs">
+                <!-- Create custom tabs with "id" equal to "tab-id" of the linked section.  -->
                 <vaadin-tab id="custom-tab-3">
-                  <div class="tab-content">
+                  <div class="vertical-tab">
                     <iron-icon icon="lumo:chevron-up"></iron-icon>
                     Custom Tab 3
                   </div>
                 </vaadin-tab>
                 <vaadin-tab id="custom-tab-4">
-                  <div class="tab-content">
+                  <div class="vertical-tab">
                     Custom Tab 4
                     <iron-icon icon="lumo:chevron-down"></iron-icon>
                   </div>
                 </vaadin-tab>
               </vaadin-tabs>
+
               <vcf-anchor-nav-section>
+                <!-- Create custom tabs using the "tab" slot of the section. -->
                 <vaadin-tab slot="tab">
                   Custom Tab 1
                   <iron-icon icon="lumo:chevron-right"></iron-icon>
@@ -339,6 +348,7 @@
                 </vaadin-tab>
                 Section 2 content.
               </vcf-anchor-nav-section>
+              <!-- Use the "tab-id" attribute to link sections with a tab in the slotted tabs element. -->
               <vcf-anchor-nav-section tab-id="custom-tab-3">
                 Section 3 content.
               </vcf-anchor-nav-section>
