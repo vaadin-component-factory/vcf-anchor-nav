@@ -55,6 +55,10 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
           padding: var(--lumo-space-m);
         }
 
+        #defaultHeader {
+          display: none;
+        }
+
         #content {
           padding: var(--lumo-space-m);
         }
@@ -81,6 +85,14 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
       name: {
         type: String,
         observer: '_nameChanged'
+      },
+      /**
+       * Id of corresponding tab element.
+       * @type {String}
+       */
+      tabId: {
+        type: String,
+        reflectToAttribute: true
       }
     };
   }
@@ -103,11 +115,16 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
   get tab() {
     if (this.nav) {
       // Get slotted tab
-      let tab = this.$.tabSlot.assignedElements()[0];
+      const tabSlot = this.shadowRoot && this.shadowRoot.querySelector('#tabSlot');
+      let tab = tabSlot && tabSlot.assignedElements()[0];
       // Otherwise get container tab
-      if (!tab) tab = this.nav.$.tabs.querySelector(`#${this._customTabId || this.defaultTabId}`);
+      if (!tab) tab = this.navTab;
       return tab;
     }
+  }
+
+  get navTab() {
+    return this.nav && this.nav.$.tabs.querySelector(`#${this.tabId || this.defaultTabId}`);
   }
 
   get url() {
@@ -138,10 +155,10 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
   }
 
   _onTabSlotChange() {
-    const tab = this.$.tabSlot.assignedElements()[0];
+    const tab = this.tab;
     if (this.nav && tab) {
       tab.removeAttribute('slot');
-      this._customTabId = tab.id;
+      this.tabId = tab.id;
       this.nav.$.tabs.appendChild(tab);
       this.nav._initTab(tab, this);
     }
@@ -160,20 +177,7 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
       }
       a.innerText = name;
     }
-  }
-
-  _setTabAnchor(tab, url) {
-    let a = tab.querySelector('a');
-    if (!a && this.nav) {
-      a = document.createElement('a');
-      Array.from(tab.childNodes).forEach(node => a.appendChild(node));
-      a.id = `${this.id}-anchor`;
-      if (!a.innerText) a.innerText = this.name;
-      if (this.nav._deepLinks) a.href = url.toString();
-      a.addEventListener('click', e => e.preventDefault());
-      tab.appendChild(a);
-      return a;
-    }
+    if (this.id || name) this.$.defaultHeader.style.display = 'block';
   }
 
   _setDefaultId() {

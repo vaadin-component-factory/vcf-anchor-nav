@@ -62,7 +62,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           --anchor-nav-inner-background: var(--lumo-base-color);
           --anchor-nav-inner-padding: 0;
           --anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
-          /* 
+          /*
            * Chrome scrollbar z-index bugfix
            * https://github.com/PolymerElements/iron-list/issues/137#issuecomment-176457768
            */
@@ -91,7 +91,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           background: var(--anchor-nav-inner-background);
         }
 
-        [part='tabs'] {
+        [part='tabs'],
+        ::slotted([part='tabs']) {
           position: -webkit-sticky;
           position: sticky;
           top: 0 !important;
@@ -99,11 +100,13 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           z-index: 1;
         }
 
-        :host([has-header]) [part='tabs'] {
+        :host([has-header]) [part='tabs'],
+        :host([has-header]) ::slotted([part='tabs']) {
           top: -1px !important;
         }
 
-        [part='tabs'][stuck]::after {
+        [part='tabs'][stuck]::after,
+        ::slotted([part='tabs'][stuck])::after {
           content: ' ';
           position: absolute;
           width: 100%;
@@ -128,7 +131,9 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         <div id="header" part="header">
           <slot id="headerSlot" name="header"></slot>
         </div>
-        <vaadin-tabs id="tabs" part="tabs"></vaadin-tabs>
+        <slot id="tabsSlot" name="tabs">
+          <vaadin-tabs id="tabs" part="tabs"></vaadin-tabs>
+        </slot>
         <slot id="slot"></slot>
       </div>
     `;
@@ -213,8 +218,11 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     stickyPolyfill.add(this.$.tabs);
     this._initTabsStuckAttribute();
     this._initContainerResizeObserver();
-    this.$.headerSlot.addEventListener('slotchange', () => this._onHeaderSlotChange());
+
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
+    this.$.tabsSlot.addEventListener('slotchange', e => this._onTabsSlotChange(e));
+    this.$.headerSlot.addEventListener('slotchange', () => this._onHeaderSlotChange());
+
     window.addEventListener('popstate', () => {
       this._initTabHighlight();
       this._scrollToHash();
@@ -227,6 +235,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   _onSlotChange() {
     if (this.sections.length) {
       this.sections.forEach(section => {
+        section.id = section.id || section.defaultId;
         // Create default tab
         let tab = section.tab;
         if (!tab) {
@@ -236,8 +245,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         }
       });
       this._initTabHighlight();
-      if (this.selectedId) this._scrollToSection(this.selectedId);
-      else if (this._deepLinks) this._scrollToHash();
+      if (this._deepLinks) this._scrollToHash();
+      else if (this.selectedId) this._scrollToSection(this.selectedId);
       // Dispatch sections-ready event
       this.dispatchEvent(new CustomEvent('sections-ready', { detail: this.sections }));
     }
@@ -246,6 +255,21 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   _onHeaderSlotChange() {
     if (this.header) this.setAttribute('has-header', true);
     else this.removeAttribute('has-header');
+  }
+
+  _onTabsSlotChange(e) {
+    const slottedTabsElement = e.target.assignedElements().filter(el => el.tagName.toUpperCase() === 'VAADIN-TABS')[0];
+    if (slottedTabsElement) {
+      const defaultTabs = Array.from(this.$.tabs.querySelectorAll('vaadin-tab'));
+      defaultTabs.forEach(tab => slottedTabsElement.appendChild(tab));
+      slottedTabsElement.setAttribute('part', 'tabs');
+      this.$.tabs.remove();
+      this.$.tabs = slottedTabsElement;
+      Array.from(slottedTabsElement.querySelectorAll('vaadin-tab')).forEach(tab => {
+        const section = this.querySelector(`[tab-id="${tab.id}"]`);
+        if (section) this._initTab(tab, section);
+      });
+    }
   }
 
   _getTitle(section) {
@@ -266,12 +290,32 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   _initTab(tab, section) {
     tab.id = tab.id || section.defaultTabId;
     tab.setAttribute('part', 'tab');
-    tab.dataset.sectionId = section.id;
-    section._setTabAnchor(tab, section.url);
     tab.addEventListener('click', () => {
       this._scrollToSection(section.id);
       if (this._deepLinks) history.pushState(null, this._getTitle(section), section.url);
     });
+    this._setTabAnchor(tab, section);
+    this._sortTabs();
+  }
+
+  _sortTabs() {
+    this.sections.forEach(section => {
+      if (section.navTab) this.$.tabs.appendChild(section.navTab);
+    });
+  }
+
+  _setTabAnchor(tab, section) {
+    let a = tab.querySelector('a');
+    if (!a) {
+      a = document.createElement('a');
+      Array.from(tab.childNodes).forEach(node => a.appendChild(node));
+      a.id = `${section.id}-anchor`;
+      if (!a.innerText) a.innerText = section.name;
+      if (this._deepLinks) a.href = section.url.toString();
+      a.addEventListener('click', e => e.preventDefault());
+      tab.appendChild(a);
+      return a;
+    }
   }
 
   _initContainerResizeObserver() {
@@ -329,10 +373,10 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     if (firstIntersecting) {
       if (!this._firstUpdate) {
         // Prevent overwriting selected index on first update
-        if (!this.selectedId && !this.selectedIndex) this.selectedIndex = this._getTabIndex(firstIntersecting.id);
+        if (!this.selectedId) this.selectedIndex = this._getSectionIndex(firstIntersecting.id);
         this._firstUpdate = true;
       } else {
-        this.selectedIndex = this._getTabIndex(firstIntersecting.id);
+        this.selectedIndex = this._getSectionIndex(firstIntersecting.id);
       }
     }
   }
@@ -346,9 +390,9 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     return height > 0 && sectionHeight >= height ? (height / sectionHeight) * factor : 1;
   }
 
-  _selectTab(sectionId) {
+  _selectTab(section) {
     this.$.tabs.querySelectorAll('vaadin-tab').forEach(tab => (tab.selected = false));
-    const tab = this._getSectionTab(sectionId);
+    const tab = section.tab;
     if (tab) tab.selected = true;
     // Horizontally scroll tabs when selected changes
     if (this.$.tabs.hasAttribute('overflow') && this.sections.length) {
@@ -364,51 +408,69 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     this.dispatchEvent(new CustomEvent('selected-changed', { detail: { index: this.selectedIndex, id: this.selectedId } }));
   }
 
-  _getTabIndex(sectionId) {
-    let tab = this._getSectionTab(sectionId);
-    let i = 0;
-    if (tab) while ((tab = tab.previousSibling) !== null) i++;
-    else i = this.selectedIndex;
-    return i;
+  _getSectionIndex(sectionId) {
+    const section = sectionId && this.querySelector(`#${sectionId}`);
+    return section && this.sections.indexOf(section);
   }
 
   _getSectionId(sectionIndex) {
-    return this.sections[sectionIndex].id;
+    return sectionIndex < this.sections.length && this.sections[sectionIndex].id;
   }
 
-  _getSectionTab(sectionId) {
-    const section = sectionId && this.querySelector(`#${sectionId}`);
-    return section && section.tab;
+  _scrollToWithCallback(offset, callback) {
+    const fixedOffset = offset.toFixed();
+    const onScroll = () => {
+      if (this.pageYOffset.toFixed() === fixedOffset) {
+        this.removeEventListener('scroll', onScroll);
+        callback();
+      }
+    };
+    this.addEventListener('scroll', onScroll);
+    onScroll();
+    return this.scrollTo({
+      top: offset,
+      behavior: 'smooth'
+    });
   }
 
-  _scrollToSection(sectionId) {
-    // Accept both section id or index
-    if (typeof sectionId === 'number') sectionId = this._getSectionId(sectionId);
+  _scrollToSection(sectionIndex) {
+    let sectionId = this._getSectionId(sectionIndex);
+    // Accept both section index or id
+    if (typeof sectionIndex === 'string') sectionId = sectionIndex;
     const section = sectionId && this.querySelector(`#${sectionId}`);
     if (section) {
+      const offset = section.offsetTop - this._tabHeight;
       section.focus({ preventScroll: true });
-      section.scrollTop = this.scrollTo({
-        top: section.offsetTop - this._tabHeight,
-        behavior: 'smooth'
-      });
+      section.scrollTop = this._scrollToWithCallback(offset, () => this._selectTab(section));
     }
   }
 
   _selectedIdChanged(selectedId) {
-    const selectedIndex = this._getTabIndex(selectedId);
-    if (this.selectedIndex !== selectedIndex) {
-      this._selectTab(selectedId);
-      this.selectedIndex = selectedIndex;
+    if (selectedId) {
+      const selectedIndex = this._getSectionIndex(selectedId);
+      if (this.selectedIndex !== selectedIndex) {
+        const section = this.querySelector(`#${selectedId}`);
+        this._selectTab(section);
+        this.selectedIndex = selectedIndex;
+      }
     }
   }
 
   _selectedIndexChanged(selectedIndex) {
-    const selectedId = this._getSectionId(selectedIndex);
-    if (this.selectedId !== selectedId) {
-      this._selectTab(selectedId);
-      this.selectedId = selectedId;
+    const section = this.sections[selectedIndex];
+    if (section && this.selectedId !== section.id) {
+      this._selectTab(section);
+      if (section.id) this.selectedId = section.id;
     }
   }
+
+  /**
+   * Fired when the slotted vcf-anchor-nav-section's are ready.
+   *
+   * @event sections-ready
+   * @param {Object} detail
+   * @param {Array<VcfAnchorNavSection>} detail.sections Array of sections.
+   */
 
   /**
    * Fired when the selected tab is changed.
