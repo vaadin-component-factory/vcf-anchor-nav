@@ -193,7 +193,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
    * @returns {Array<VcfAnchorNavSection>}
    */
   get sections() {
-    return this.$.slot.assignedNodes().filter(node => node.tagName === 'VCF-ANCHOR-NAV-SECTION');
+    const slot = this.shadowRoot && this.shadowRoot.querySelector('#slot');
+    return (slot && slot.assignedNodes().filter(node => node.tagName === 'VCF-ANCHOR-NAV-SECTION')) || [];
   }
 
   /**
@@ -223,13 +224,14 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     this.$.tabsSlot.addEventListener('slotchange', e => this._onTabsSlotChange(e));
     this.$.headerSlot.addEventListener('slotchange', () => this._onHeaderSlotChange());
 
+    this._verticalTabs = false;
+    this.style.setProperty('--_tab-height', `${this._tabHeight}px`);
+    this.style.setProperty('--_height', `${this.clientHeight}px`);
+
     window.addEventListener('popstate', () => {
       this._initTabHighlight();
       this._scrollToHash();
     });
-    this._verticalTabs = false;
-    this.style.setProperty('--_tab-height', `${this._tabHeight}px`);
-    this.style.setProperty('--_height', `${this.clientHeight}px`);
   }
 
   _onSlotChange() {
@@ -244,6 +246,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           this._initTab(tab, section);
         }
       });
+      this._sortTabs();
       this._initTabHighlight();
       if (this._deepLinks) this._scrollToHash();
       else if (this.selectedId) this._scrollToSection(this.selectedId);
@@ -295,7 +298,6 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       if (this._deepLinks) history.pushState(null, this._getTitle(section), section.url);
     });
     this._setTabAnchor(tab, section);
-    this._sortTabs();
   }
 
   _sortTabs() {

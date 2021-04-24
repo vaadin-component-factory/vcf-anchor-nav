@@ -31,7 +31,7 @@ import { ElementMixin } from '@vaadin/vaadin-element-mixin';
  * @mixes ThemableMixin
  * @demo demo/index.html
  */
-class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
+class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)) {
   static get is() {
     return 'vcf-anchor-nav-section';
   }
@@ -99,7 +99,7 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
 
   constructor() {
     super();
-    this.name = this.name || `Section ${this.sectionNumber}`;
+    this.name = this.name || this.defaultName;
   }
 
   ready() {
@@ -112,15 +112,23 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
     return this.parentElement.tagName === 'VCF-ANCHOR-NAV' ? this.parentElement : null;
   }
 
+  get navSections() {
+    return this.nav && Array.from(this.nav.querySelectorAll(AnchorNavSectionElement.is));
+  }
+
   get tab() {
     if (this.nav) {
       // Get slotted tab
-      const tabSlot = this.shadowRoot && this.shadowRoot.querySelector('#tabSlot');
-      let tab = tabSlot && tabSlot.assignedElements()[0];
+      let tab = this.slottedTab;
       // Otherwise get container tab
       if (!tab) tab = this.navTab;
       return tab;
     }
+  }
+
+  get slottedTab() {
+    const tabSlot = this.shadowRoot && this.shadowRoot.querySelector('#tabSlot');
+    return tabSlot && tabSlot.assignedElements()[0];
   }
 
   get navTab() {
@@ -138,17 +146,23 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
     return `${this.id}-tab`;
   }
 
-  get sectionNumber() {
-    if (this.nav) {
-      const sections = Array.from(this.nav.querySelectorAll(VcfAnchorNavSection.is));
-      let i = 0;
-      if (sections.length) while (sections[i] !== this) i++;
-      return i + 1;
+  get sectionIndex() {
+    let i = null;
+    if (this.navSections) {
+      i = 0;
+      if (this.navSections.length) {
+        while (this.navSections[i] !== this) i++;
+      }
     }
+    return i;
+  }
+
+  get defaultName() {
+    return `Section${this.sectionIndex !== null ? ` ${this.sectionIndex + 1}` : ''}`;
   }
 
   get defaultId() {
-    return this.name
+    return this.defaultName
       .replace(/[^a-zA-Z0-9- ]/g, '')
       .replace(/ /g, '-')
       .toLowerCase();
@@ -161,6 +175,7 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
       this.tabId = tab.id;
       this.nav.$.tabs.appendChild(tab);
       this.nav._initTab(tab, this);
+      this.nav._sortTabs();
     }
   }
 
@@ -177,12 +192,12 @@ class VcfAnchorNavSection extends ElementMixin(ThemableMixin(PolymerElement)) {
       }
       a.innerText = name;
     }
-    if (this.id || name) this.$.defaultHeader.style.display = 'block';
+    if (name && name !== this.defaultName) this.$.defaultHeader.style.display = 'block';
   }
 
   _setDefaultId() {
-    if (!this.id && this.name) this.id = this.defaultId;
+    if (!this.id) this.id = this.defaultId;
   }
 }
 
-customElements.define(VcfAnchorNavSection.is, VcfAnchorNavSection);
+customElements.define(AnchorNavSectionElement.is, AnchorNavSectionElement);
