@@ -109,7 +109,7 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   get nav() {
-    return this.parentElement.tagName === 'VCF-ANCHOR-NAV' ? this.parentElement : null;
+    return this.parentElement && (this.parentElement.tagName === 'VCF-ANCHOR-NAV' ? this.parentElement : null);
   }
 
   get navSections() {
