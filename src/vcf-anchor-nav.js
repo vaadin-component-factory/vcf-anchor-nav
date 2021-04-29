@@ -281,7 +281,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   _scrollToHash() {
     // Hack to fix initial scroll on Firefox
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       // Scroll to and select section in URL hash if possible
       if (location.hash) {
         const section = this.querySelector(location.hash);
@@ -358,7 +358,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _initTabsStuckAttribute() {
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       const observer = new IntersectionObserver(
         ([e]) => {
           e.target.toggleAttribute('stuck', !this.hasAttribute('has-header') || e.intersectionRatio < 1);
@@ -422,8 +422,10 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _setSelectedSection(sectionIndex) {
-    this.selectedIndex = sectionIndex;
-    this._scrollToSection(sectionIndex, false);
+    requestAnimationFrame(() => {
+      this.selectedIndex = sectionIndex;
+      this._scrollToSection(sectionIndex, false);
+    });
   }
 
   _scrollToSection(sectionIndex, smooth) {
