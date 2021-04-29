@@ -124,7 +124,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         }
 
         :host([theme~='expand-last']) ::slotted(vcf-anchor-nav-section:last-of-type) {
-          min-height: calc(var(--_height) - var(--_tab-height));
+          min-height: var(--_expand-last-height);
         }
       </style>
       <div id="container" part="container">
@@ -209,25 +209,28 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     return this._verticalTabs ? 0 : this.$.tabs.clientHeight;
   }
 
+  get _expandLastHeight() {
+    return this.clientHeight - this._tabHeight;
+  }
+
   get _deepLinks() {
     return !this.disablePreserveOnRefresh;
   }
 
   ready() {
     super.ready();
+    this._verticalTabs = false;
+    // Add polyfills
     smoothScrollPolyfill();
     stickyPolyfill.add(this.$.tabs);
+    // Init observers
     this._initTabsStuckAttribute();
     this._initContainerResizeObserver();
-
+    // Add slotchange listeners
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
     this.$.tabsSlot.addEventListener('slotchange', e => this._onTabsSlotChange(e));
     this.$.headerSlot.addEventListener('slotchange', () => this._onHeaderSlotChange());
-
-    this._verticalTabs = false;
-    this.style.setProperty('--_tab-height', `${this._tabHeight}px`);
-    this.style.setProperty('--_height', `${this.clientHeight}px`);
-
+    // Add popstate listener
     window.addEventListener('popstate', () => {
       this._initTabHighlight();
       this._scrollToHash();
@@ -252,6 +255,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       else if (this.selectedId) this._scrollToSection(this.selectedId);
       // Dispatch sections-ready event
       this.dispatchEvent(new CustomEvent('sections-ready', { detail: this.sections }));
+      // Set exapnd-last theme height
+      this.style.setProperty('--_expand-last-height', `${this._expandLastHeight}px`);
     }
   }
 
@@ -355,6 +360,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       }
     });
     this._observeIntersections = true;
+    this._firstTabSelect = true;
   }
 
   _initTabsStuckAttribute() {
@@ -406,8 +412,9 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       const left = this.$.tabs.$.scroll.scrollWidth * scrollRatio;
       this.$.tabs.$.scroll.scrollTo({
         left: left && left - leftOffset,
-        behavior: 'smooth'
+        behavior: this._firstTabSelect ? 'auto' : 'smooth'
       });
+      this._firstTabSelect = false;
     }
     this.dispatchEvent(new CustomEvent('selected-changed', { detail: { index: this.selectedIndex, id: this.selectedId } }));
   }
