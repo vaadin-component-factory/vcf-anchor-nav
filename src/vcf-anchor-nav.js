@@ -283,10 +283,12 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     // Hack to fix initial scroll on Firefox
     setTimeout(() => {
       // Scroll to and select section in URL hash if possible
-      const section = location.hash && this.querySelector(location.hash);
-      const top = section ? section.offsetTop - this._tabHeight : 0;
-      this.scrollTo({ top });
-      if (section) this.selectedId = location.hash.replace('#', '');
+      if (location.hash) {
+        const section = this.querySelector(location.hash);
+        const top = section ? section.offsetTop - this._tabHeight : 0;
+        this.scrollTo({ top });
+        if (section) this.selectedId = location.hash.replace('#', '');
+      }
     });
   }
 
