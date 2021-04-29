@@ -248,7 +248,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       });
       this._sortTabs();
       this._initTabHighlight();
-      if (this._deepLinks) this._scrollToHash();
+      if (this._deepLinks && location.hash) this._scrollToHash();
       else if (this.selectedId) this._scrollToSection(this.selectedId);
       // Dispatch sections-ready event
       this.dispatchEvent(new CustomEvent('sections-ready', { detail: this.sections }));
@@ -421,7 +421,12 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     return sectionIndex < this.sections.length && this.sections[sectionIndex].id;
   }
 
-  _scrollToSection(sectionIndex) {
+  _setSelectedSection(sectionIndex) {
+    this.selectedIndex = sectionIndex;
+    this._scrollToSection(sectionIndex, false);
+  }
+
+  _scrollToSection(sectionIndex, smooth) {
     let sectionId = this._getSectionId(sectionIndex);
     // Accept both section index or id
     if (typeof sectionIndex === 'string') sectionId = sectionIndex;
@@ -430,7 +435,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       section.focus({ preventScroll: true });
       section.scrollTop = this.scrollTo({
         top: section.offsetTop - this._tabHeight,
-        behavior: 'smooth'
+        behavior: smooth ? 'smooth' : 'auto'
       });
     }
   }
