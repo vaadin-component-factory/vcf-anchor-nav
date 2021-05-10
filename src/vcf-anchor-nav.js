@@ -435,7 +435,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     });
   }
 
-  _scrollToSection(sectionIndex, smooth) {
+  _scrollToSection(sectionIndex, smooth = true) {
     let sectionId = this._getSectionId(sectionIndex);
     // Accept both section index or id
     if (typeof sectionIndex === 'string') sectionId = sectionIndex;

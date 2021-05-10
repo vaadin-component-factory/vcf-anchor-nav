@@ -55,10 +55,6 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
           padding: var(--lumo-space-m);
         }
 
-        #defaultHeader {
-          display: none;
-        }
-
         #content {
           padding: var(--lumo-space-m);
         }
@@ -192,7 +188,6 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
       }
       a.innerText = name;
     }
-    if (name && name !== this.defaultName) this.$.defaultHeader.style.display = 'block';
   }
 
   _setDefaultId() {
