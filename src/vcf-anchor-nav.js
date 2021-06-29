@@ -143,6 +143,10 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     return 'vcf-anchor-nav';
   }
 
+  static isSame(el) {
+    return el.tagName === `${AnchorNavElement.is}`.toUpperCase();
+  }
+
   static get version() {
     return '1.2.9';
   }
@@ -235,6 +239,18 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       this._initTabHighlight();
       this._scrollToHash();
     });
+    // Add nav focus listener
+    this.addEventListener('focus', e => this._onNavFocus(e), true);
+    // Init section focus listener
+    this.onSectionFocus = () => {
+      this.sections.forEach(section => section.removeAttribute('tabindex'));
+    };
+  }
+
+  _onNavFocus(e) {
+    if (AnchorNavElement.isSame(e.target)) {
+      this.sections.forEach(section => section.setAttribute('tabindex', '-1'));
+    }
   }
 
   _onSlotChange() {
@@ -248,16 +264,22 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           this.$.tabs.appendChild(tab);
           this._initTab(tab, section);
         }
+        section.removeEventListener('section-focus', this.onSectionFocus);
+        section.addEventListener('section-focus', this.onSectionFocus);
       });
       this._sortTabs();
       this._initTabHighlight();
       if (this._deepLinks && location.hash) this._scrollToHash();
-      else if (this.selectedId) this._scrollToSection(this.selectedId);
+      else if (this.selectedId && this.selectedIndex !== 0) this._scrollToSection(this.selectedId);
       // Dispatch sections-ready event
       this.dispatchEvent(new CustomEvent('sections-ready', { detail: this.sections }));
       // Set exapnd-last theme height
-      this.style.setProperty('--_expand-last-height', `${this._expandLastHeight}px`);
+      this._setExpandLastHeight();
     }
+  }
+
+  _setExpandLastHeight() {
+    this.style.setProperty('--_expand-last-height', `${this._expandLastHeight}px`);
   }
 
   _onHeaderSlotChange() {
@@ -285,7 +307,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _scrollToHash() {
-    // Hack to fix initial scroll on Firefox
+    // rAF required to fix initial scroll on all browsers
     requestAnimationFrame(() => {
       // Scroll to and select section in URL hash if possible
       if (location.hash) {
@@ -331,7 +353,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     let firstResize = true;
     const observer = new ResizeObserver(() => {
       this._initTabHighlight();
-      if (this.selectedId && firstResize) {
+      this._setExpandLastHeight();
+      if (this.selectedId && this.selectedIndex !== 0 && firstResize) {
         const section = this.querySelector(`#${this.selectedId}`);
         if (section) this.scrollTo({ top: section.offsetTop - this._tabHeight });
         firstResize = false;

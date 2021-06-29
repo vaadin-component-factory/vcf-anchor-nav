@@ -36,6 +36,10 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
     return 'vcf-anchor-nav-section';
   }
 
+  static isSame(el) {
+    return el.tagName === `${AnchorNavSectionElement.is}`.toUpperCase();
+  }
+
   static get template() {
     return html`
       <style>
@@ -102,6 +106,11 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
     super.ready();
     this.setAttribute('tabindex', '-1');
     this.$.tabSlot.addEventListener('slotchange', e => this._onTabSlotChange(e));
+    this.addEventListener('focus', e => {
+      if (AnchorNavSectionElement.isSame(e.target)) {
+        this.dispatchEvent(new CustomEvent('section-focus'));
+      }
+    });
   }
 
   get nav() {
