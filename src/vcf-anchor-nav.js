@@ -352,13 +352,15 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   _initContainerResizeObserver() {
     let firstResize = true;
     const observer = new ResizeObserver(() => {
-      this._initTabHighlight();
-      this._setExpandLastHeight();
-      if (this.selectedId && this.selectedIndex !== 0 && firstResize) {
-        const section = this.querySelector(`#${this.selectedId}`);
-        if (section) this.scrollTo({ top: section.offsetTop - this._tabHeight });
-        firstResize = false;
-      }
+      requestAnimationFrame(() => {
+        this._initTabHighlight();
+        this._setExpandLastHeight();
+        if (this.selectedId && this.selectedIndex !== 0 && firstResize) {
+          const section = this.querySelector(`#${this.selectedId}`);
+          if (section) this.scrollTo({ top: section.offsetTop - this._tabHeight });
+          firstResize = false;
+        }
+      });
     });
     observer.observe(this.$.container);
   }
