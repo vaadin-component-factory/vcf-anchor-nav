@@ -1,0 +1,201 @@
+{
+  "version": "experimental",
+  "tags": [
+    {
+      "name": "vcf-anchor-nav-section",
+      "path": "./src/vcf-anchor-nav-section.js",
+      "description": "`<vcf-anchor-nav-section>`\nSection element used inside `vcf-anchor-nav`.\n\n```html\n<vcf-anchor-nav-section name=\"Section 1\"></vcf-anchor-nav-section>\n```\n\n### Styling\n\nThe following custom properties are available for styling:\n\nCustom property | Description | Default\n----------------|-------------|-------------\n`--anchor-nav-section-border-width` | `border-width` of section. | `0`\n`--anchor-nav-section-border-color` | `border-color` of section. | `var(--lumo-contrast-10pct)`\n\nThe following shadow DOM parts are available for styling:\n\nPart name | Description\n----------------|----------------\n`header` | Header section.\n`content` | Content section.",
+      "attributes": [
+        {
+          "name": "tab-id",
+          "description": "Id of corresponding tab element.",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "description": "Used to set corresponding tab label and default header text.\nIf not set defaults to \"Section <index>\".",
+          "type": "String"
+        }
+      ],
+      "properties": [
+        {
+          "name": "tabId",
+          "attribute": "tab-id",
+          "description": "Id of corresponding tab element.",
+          "type": "String"
+        },
+        {
+          "name": "nav",
+          "type": "HTMLElement | null"
+        },
+        {
+          "name": "navSections",
+          "type": "Element[] | null"
+        },
+        {
+          "name": "tab"
+        },
+        {
+          "name": "slottedTab"
+        },
+        {
+          "name": "navTab"
+        },
+        {
+          "name": "url",
+          "type": "URL"
+        },
+        {
+          "name": "defaultTabId",
+          "type": "string"
+        },
+        {
+          "name": "sectionIndex",
+          "type": "number | null"
+        },
+        {
+          "name": "defaultName",
+          "type": "string"
+        },
+        {
+          "name": "defaultId",
+          "type": "string"
+        },
+        {
+          "name": "name",
+          "attribute": "name",
+          "description": "Used to set corresponding tab label and default header text.\nIf not set defaults to \"Section <index>\".",
+          "type": "String"
+        },
+        {
+          "name": "theme",
+          "description": "Helper property with theme attribute value facilitating propagation\nin shadow DOM.\n\nEnables the component implementation to propagate the `theme`\nattribute value to the subcomponents in Shadow DOM by binding\nthe subcomponent’s \"theme\" attribute to the `theme` property of\nthe host.\n\n**NOTE:** Extending the mixin only provides the property for binding,\nand does not make the propagation alone.\n\nSee [Theme Attribute and Subcomponents](https://github.com/vaadin/vaadin-themable-mixin/wiki/5.-Theme-Attribute-and-Subcomponents).\npage for more information.",
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "rootPath",
+          "type": "string"
+        },
+        {
+          "name": "importPath",
+          "type": "string"
+        },
+        {
+          "name": "root",
+          "type": "HTMLElement | ShadowRoot | StampedTemplate | null"
+        },
+        {
+          "name": "$",
+          "type": "{ [key: string]: Element; }"
+        },
+        {
+          "name": "PROPERTY_EFFECT_TYPES"
+        }
+      ],
+      "events": [
+        {
+          "name": "section-focus"
+        }
+      ]
+    },
+    {
+      "name": "vcf-anchor-nav",
+      "path": "./src/vcf-anchor-nav.js",
+      "description": "`<vcf-anchor-nav>`\r\nWeb Component for easily creating layouts with sticky anchor navigation tabs and content sections.\r\n\r\n- Automates the linking of tabs and sections.\r\n- Smooth scrolls to section on tab click and sets the URL hash.\r\n- Scrolls to URL hash on load (preserve selected tab on refresh).\r\n\r\n```html\r\n<vcf-anchor-nav>\r\n   <h1 slot=\"header\">Header</h1>\r\n   <vcf-anchor-nav-section name=\"One\"> ... </vcf-anchor-nav-section>\r\n   <vcf-anchor-nav-section name=\"Two\"> ... </vcf-anchor-nav-section>\r\n   <vcf-anchor-nav-section name=\"Three\"> ... </vcf-anchor-nav-section>\r\n</vcf-anchor-nav>\r\n```\r\n\r\n### Styling\r\n\r\nThe following custom properties are available for styling:\r\n\r\nCustom property | Description | Default\r\n----------------|-------------|-------------\r\n`--anchor-nav-inner-max-width` | `max-width` of \"container\" part. | `auto`\r\n`--anchor-nav-inner-background` | `background` of \"container\" part. | `#ffffff`\r\n`--anchor-nav-inner-padding` | `padding` of \"container\" part. | `0 0 20vh 0`\r\n`--anchor-nav-tabs-stuck-box-shadow` | `box-shadow` of \"tabs\" part when stuck to top of viewport. | `0 4px 5px -6px rgba(0, 0, 0, 0.4)`\r\n\r\nThe following shadow DOM parts are available for styling:\r\n\r\nPart name | Description\r\n----------------|----------------\r\n`container` | Main container for header, tabs and sections.\r\n`header` | Wrapper for header slot above tabs.\r\n`tabs` | Internal `vaadin-tabs` used for navigation.",
+      "attributes": [
+        {
+          "name": "selected-id",
+          "description": "Id of selected section.",
+          "type": "String"
+        },
+        {
+          "name": "selected-index",
+          "description": "Index of selected section.",
+          "type": "Number",
+          "default": "0"
+        },
+        {
+          "name": "fullscreen",
+          "description": "Component fills the entire screen.",
+          "type": "String"
+        },
+        {
+          "name": "disable-preserve-on-refresh",
+          "description": "Disables preserving of selected tab and scroll position on refresh.",
+          "type": "Boolean",
+          "default": "false"
+        }
+      ],
+      "properties": [
+        {
+          "name": "selectedId",
+          "attribute": "selected-id",
+          "description": "Id of selected section.",
+          "type": "String"
+        },
+        {
+          "name": "selectedIndex",
+          "attribute": "selected-index",
+          "description": "Index of selected section.",
+          "type": "Number",
+          "default": "0"
+        },
+        {
+          "name": "fullscreen",
+          "attribute": "fullscreen",
+          "description": "Component fills the entire screen.",
+          "type": "String"
+        },
+        {
+          "name": "disablePreserveOnRefresh",
+          "attribute": "disable-preserve-on-refresh",
+          "description": "Disables preserving of selected tab and scroll position on refresh.",
+          "type": "Boolean",
+          "default": "false"
+        },
+        {
+          "name": "sections",
+          "description": "Returns array of the slotted section elements.",
+          "type": "array"
+        },
+        {
+          "name": "header",
+          "description": "Returns the slotted header element.",
+          "type": "HTMLElement"
+        },
+        {
+          "name": "theme",
+          "description": "Helper property with theme attribute value facilitating propagation\nin shadow DOM.\n\nEnables the component implementation to propagate the `theme`\nattribute value to the subcomponents in Shadow DOM by binding\nthe subcomponent’s \"theme\" attribute to the `theme` property of\nthe host.\n\n**NOTE:** Extending the mixin only provides the property for binding,\nand does not make the propagation alone.\n\nSee [Theme Attribute and Subcomponents](https://github.com/vaadin/vaadin-themable-mixin/wiki/5.-Theme-Attribute-and-Subcomponents).\npage for more information.",
+          "type": "string | null | undefined"
+        },
+        {
+          "name": "rootPath",
+          "type": "string"
+        },
+        {
+          "name": "importPath",
+          "type": "string"
+        },
+        {
+          "name": "root",
+          "type": "HTMLElement | ShadowRoot | StampedTemplate | null"
+        },
+        {
+          "name": "$",
+          "type": "{ [key: string]: Element; }"
+        },
+        {
+          "name": "PROPERTY_EFFECT_TYPES"
+        }
+      ],
+      "events": [
+        {
+          "name": "sections-ready"
+        },
+        {
+          "name": "selected-changed"
+        }
+      ]
+    }
+  ]
+}
