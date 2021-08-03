@@ -97,7 +97,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           position: sticky;
           top: 0 !important;
           background: var(--lumo-base-color);
-          z-index: 1;
+          z-index: 2;
         }
 
         :host([has-header]) [part='tabs'],
