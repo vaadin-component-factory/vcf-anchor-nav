@@ -148,7 +148,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   static get version() {
-    return '1.2.12';
+    return '1.2.13';
   }
 
   static get properties() {
