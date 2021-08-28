@@ -229,6 +229,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     stickyPolyfill.add(this.$.tabs);
     // Init observers
     this._initTabsStuckAttribute();
+    this._initWindowResizeListener();
     this._initContainerResizeObserver();
     // Add slotchange listeners
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
@@ -365,6 +366,31 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     observer.observe(this.$.container);
   }
 
+  _initWindowResizeListener() {
+    let windowHeight = window.innerHeight;
+    let windowResizeTimeout;
+    window.addEventListener('resize', () => {
+      // Debounce resize event
+      clearTimeout(windowResizeTimeout);
+      windowResizeTimeout = setTimeout(() => {
+        if (windowHeight !== window.innerHeight) {
+          this._initTabHighlight();
+          this._setExpandLastHeight();
+          windowHeight = window.innerHeight;
+        }
+      }, 300);
+    });
+  }
+
+  _clearIntersectionObservers() {
+    if (this._intersectionObservers) {
+      this._intersectionObservers.forEach(o => {
+        o.observer.unobserve(o.element);
+      });
+    }
+    this._intersectionObservers = [];
+  }
+
   _initTabHighlight() {
     const callback = (entries, observer) => {
       if (this._observeIntersections) {
@@ -374,6 +400,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         this._updateSelected();
       }
     };
+    this._clearIntersectionObservers();
     this.sections.forEach((element, i) => {
       if (element.clientHeight) {
         const options = {
@@ -382,6 +409,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         };
         const observer = new IntersectionObserver(callback, options);
         observer.observe(element);
+        this._intersectionObservers[i] = { observer, element };
       }
     });
     this._observeIntersections = true;

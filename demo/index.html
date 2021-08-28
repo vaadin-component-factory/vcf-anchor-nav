@@ -265,10 +265,6 @@
 
             <script>
               window.addEventListener('WebComponentsReady', () => {
-                // Set section height to avoid resize calculations
-                const anchorNavSection = document.querySelector('#fullscreen-example');
-                anchorNavSection.style.height = anchorNavSection.clientHeight + 'px';
-
                 document.querySelector('#fullscreen vaadin-button').addEventListener('click', () => {
                   // Toggle fullscreen
                   const anchorNav = document.querySelector('#fullscreen');
