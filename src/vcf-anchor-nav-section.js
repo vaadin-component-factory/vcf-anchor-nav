@@ -36,6 +36,10 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
     return 'vcf-anchor-nav-section';
   }
 
+  static isSame(el) {
+    return el.tagName === `${AnchorNavSectionElement.is}`.toUpperCase();
+  }
+
   static get template() {
     return html`
       <style>
@@ -53,10 +57,6 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
         ::slotted([slot='header']) {
           margin: 0;
           padding: var(--lumo-space-m);
-        }
-
-        #defaultHeader {
-          display: none;
         }
 
         #content {
@@ -106,6 +106,11 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
     super.ready();
     this.setAttribute('tabindex', '-1');
     this.$.tabSlot.addEventListener('slotchange', e => this._onTabSlotChange(e));
+    this.addEventListener('focus', e => {
+      if (AnchorNavSectionElement.isSame(e.target)) {
+        this.dispatchEvent(new CustomEvent('section-focus'));
+      }
+    });
   }
 
   get nav() {
@@ -192,7 +197,6 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
       }
       a.innerText = name;
     }
-    if (name && name !== this.defaultName) this.$.defaultHeader.style.display = 'block';
   }
 
   _setDefaultId() {

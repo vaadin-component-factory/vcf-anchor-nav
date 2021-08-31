@@ -97,7 +97,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           position: sticky;
           top: 0 !important;
           background: var(--lumo-base-color);
-          z-index: 1;
+          z-index: 2;
         }
 
         :host([has-header]) [part='tabs'],
@@ -143,8 +143,12 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     return 'vcf-anchor-nav';
   }
 
+  static isSame(el) {
+    return el.tagName === `${AnchorNavElement.is}`.toUpperCase();
+  }
+
   static get version() {
-    return '1.2.8';
+    return '1.2.13';
   }
 
   static get properties() {
@@ -170,7 +174,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
       /**
        * Component fills the entire screen.
-       * @type {String}
+       * @type {Boolean}
        */
       fullscreen: {
         type: Boolean,
@@ -225,6 +229,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     stickyPolyfill.add(this.$.tabs);
     // Init observers
     this._initTabsStuckAttribute();
+    this._initWindowResizeListener();
     this._initContainerResizeObserver();
     // Add slotchange listeners
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
@@ -235,6 +240,18 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       this._initTabHighlight();
       this._scrollToHash();
     });
+    // Add nav focus listener
+    this.addEventListener('focus', e => this._onNavFocus(e), true);
+    // Init section focus listener
+    this.onSectionFocus = () => {
+      this.sections.forEach(section => section.removeAttribute('tabindex'));
+    };
+  }
+
+  _onNavFocus(e) {
+    if (AnchorNavElement.isSame(e.target)) {
+      this.sections.forEach(section => section.setAttribute('tabindex', '-1'));
+    }
   }
 
   _onSlotChange() {
@@ -248,16 +265,22 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           this.$.tabs.appendChild(tab);
           this._initTab(tab, section);
         }
+        section.removeEventListener('section-focus', this.onSectionFocus);
+        section.addEventListener('section-focus', this.onSectionFocus);
       });
       this._sortTabs();
       this._initTabHighlight();
       if (this._deepLinks && location.hash) this._scrollToHash();
-      else if (this.selectedId) this._scrollToSection(this.selectedId);
+      else if (this.selectedId && this.selectedIndex !== 0) this._scrollToSection(this.selectedId);
       // Dispatch sections-ready event
       this.dispatchEvent(new CustomEvent('sections-ready', { detail: this.sections }));
       // Set exapnd-last theme height
-      this.style.setProperty('--_expand-last-height', `${this._expandLastHeight}px`);
+      this._setExpandLastHeight();
     }
+  }
+
+  _setExpandLastHeight() {
+    this.style.setProperty('--_expand-last-height', `${this._expandLastHeight}px`);
   }
 
   _onHeaderSlotChange() {
@@ -285,7 +308,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _scrollToHash() {
-    // Hack to fix initial scroll on Firefox
+    // rAF required to fix initial scroll on all browsers
     requestAnimationFrame(() => {
       // Scroll to and select section in URL hash if possible
       if (location.hash) {
@@ -330,14 +353,42 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   _initContainerResizeObserver() {
     let firstResize = true;
     const observer = new ResizeObserver(() => {
-      this._initTabHighlight();
-      if (this.selectedId && firstResize) {
-        const section = this.querySelector(`#${this.selectedId}`);
-        if (section) this.scrollTo({ top: section.offsetTop - this._tabHeight });
-        firstResize = false;
-      }
+      requestAnimationFrame(() => {
+        this._initTabHighlight();
+        this._setExpandLastHeight();
+        if (this.selectedId && this.selectedIndex !== 0 && firstResize) {
+          const section = this.querySelector(`#${this.selectedId}`);
+          if (section) this.scrollTo({ top: section.offsetTop - this._tabHeight });
+          firstResize = false;
+        }
+      });
     });
     observer.observe(this.$.container);
+  }
+
+  _initWindowResizeListener() {
+    let windowHeight = window.innerHeight;
+    let windowResizeTimeout;
+    window.addEventListener('resize', () => {
+      // Debounce resize event
+      clearTimeout(windowResizeTimeout);
+      windowResizeTimeout = setTimeout(() => {
+        if (windowHeight !== window.innerHeight) {
+          this._initTabHighlight();
+          this._setExpandLastHeight();
+          windowHeight = window.innerHeight;
+        }
+      }, 300);
+    });
+  }
+
+  _clearIntersectionObservers() {
+    if (this._intersectionObservers) {
+      this._intersectionObservers.forEach(o => {
+        o.observer.unobserve(o.element);
+      });
+    }
+    this._intersectionObservers = [];
   }
 
   _initTabHighlight() {
@@ -349,6 +400,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         this._updateSelected();
       }
     };
+    this._clearIntersectionObservers();
     this.sections.forEach((element, i) => {
       if (element.clientHeight) {
         const options = {
@@ -357,6 +409,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         };
         const observer = new IntersectionObserver(callback, options);
         observer.observe(element);
+        this._intersectionObservers[i] = { observer, element };
       }
     });
     this._observeIntersections = true;
@@ -435,7 +488,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     });
   }
 
-  _scrollToSection(sectionIndex, smooth) {
+  _scrollToSection(sectionIndex, smooth = true) {
     let sectionId = this._getSectionId(sectionIndex);
     // Accept both section index or id
     if (typeof sectionIndex === 'string') sectionId = sectionIndex;

@@ -221,9 +221,11 @@
               </vcf-anchor-nav-section>
               <vcf-anchor-nav-section style="height: 20vh;">
                 Section 4 is short.
+                <vaadin-text-field></vaadin-text-field>
               </vcf-anchor-nav-section>
               <vcf-anchor-nav-section style="height: 120vh;">
                 Section 5 is long.
+                <vaadin-text-field></vaadin-text-field>
               </vcf-anchor-nav-section>
               <vcf-anchor-nav-section>Section 6 content.</vcf-anchor-nav-section>
             </vcf-anchor-nav>
@@ -263,10 +265,6 @@
 
             <script>
               window.addEventListener('WebComponentsReady', () => {
-                // Set section height to avoid resize calculations
-                const anchorNavSection = document.querySelector('#fullscreen-example');
-                anchorNavSection.style.height = anchorNavSection.clientHeight + 'px';
-
                 document.querySelector('#fullscreen vaadin-button').addEventListener('click', () => {
                   // Toggle fullscreen
                   const anchorNav = document.querySelector('#fullscreen');
@@ -315,7 +313,7 @@
               }
             </style>
 
-            <vcf-anchor-nav id="custom-tabs" disable-preserve-on-refresh>
+            <vcf-anchor-nav id="custom-tabs" theme="expand-last" disable-preserve-on-refresh>
               <!-- Add your own <vaadin-tabs> to the "tabs" slot. -->
               <vaadin-tabs slot="tabs">
                 <!-- Create custom <vaadin-tab> with "id" equal to "tab-id" of the linked section. -->
