@@ -1,6 +1,6 @@
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin';
-import { ElementMixin } from '@vaadin/vaadin-element-mixin';
+import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
 
 /**
  * `<vcf-anchor-nav-section>`
