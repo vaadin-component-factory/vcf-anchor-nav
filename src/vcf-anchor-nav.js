@@ -324,8 +324,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     tab.id = tab.id || section.defaultTabId;
     tab.setAttribute('part', 'tab');
     tab.addEventListener('click', () => {
-      this._scrollToSection(section.id);
-      if (this._deepLinks) history.pushState(null, this._getTitle(section), section.url);
+      this._scrollToSection(section.id, false, this._deepLinks);
     });
     this._setTabAnchor(tab, section);
   }
@@ -488,7 +487,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     });
   }
 
-  _scrollToSection(sectionIndex, smooth = true) {
+  _scrollToSection(sectionIndex, smooth = true, deepLinks = true) {
     let sectionId = this._getSectionId(sectionIndex);
     // Accept both section index or id
     if (typeof sectionIndex === 'string') sectionId = sectionIndex;
@@ -499,6 +498,9 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         top: section.offsetTop - this._tabHeight,
         behavior: smooth ? 'smooth' : 'auto'
       });
+    }
+    if (deepLinks) {
+      history.pushState(null, this._getTitle(section), section.url);
     }
   }
 
