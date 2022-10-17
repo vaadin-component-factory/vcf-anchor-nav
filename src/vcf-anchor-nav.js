@@ -250,7 +250,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   _onNavFocus(e) {
     if (AnchorNavElement.isSame(e.target)) {
-      this.sections.forEach(section => section.setAttribute('tabindex', '-1'));
+      this.sections.forEach(section => section.setAttribute('tabindex', '0'));
     }
   }
 
