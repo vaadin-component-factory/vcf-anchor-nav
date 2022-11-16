@@ -188,6 +188,15 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       disablePreserveOnRefresh: {
         type: Boolean,
         value: false
+      },
+
+      /**
+       * Set true to enable smooth scroll animation on tab clicks.
+       * @type {Boolean}
+       */
+      smoothScroll: {
+        type: Boolean,
+        value: true
       }
     };
   }
@@ -323,9 +332,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   _initTab(tab, section) {
     tab.id = tab.id || section.defaultTabId;
     tab.setAttribute('part', 'tab');
-    tab.addEventListener('click', () => {
-      this._scrollToSection(section.id, false, this._deepLinks);
-    });
+    tab.addEventListener('click', () => this._scrollToSection(section.id, this.smoothScroll, this._deepLinks));
     this._setTabAnchor(tab, section);
   }
 
