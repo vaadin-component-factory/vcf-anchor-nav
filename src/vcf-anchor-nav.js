@@ -197,6 +197,16 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       smoothScroll: {
         type: Boolean,
         value: true
+      },
+      /**
+       * Set to true to disable history of internal navigation so that
+       * pressing back and forward in the browser only move between
+       * views / pages and not navigation sections
+       */
+      noHistory: {
+        type: Boolean,
+        value: false,
+        notify: true
       }
     };
   }
@@ -232,6 +242,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   ready() {
     super.ready();
+    // eslint-disable-next-line no-console
+    console.log('-----==');
     this._verticalTabs = false;
     // Add polyfills
     smoothScrollPolyfill();
@@ -244,8 +256,10 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
     this.$.tabsSlot.addEventListener('slotchange', e => this._onTabsSlotChange(e));
     this.$.headerSlot.addEventListener('slotchange', () => this._onHeaderSlotChange());
+    this._toggleNoHistory(this.noHistory);
+
     // Add popstate listener
-    window.addEventListener('popstate', () => {
+    window.addEventListener('popstate', event => {
       this._initTabHighlight();
       this._scrollToHash();
     });
@@ -255,6 +269,58 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     this.onSectionFocus = () => {
       this.sections.forEach(section => section.removeAttribute('tabindex'));
     };
+    this.addEventListener('no-history-changed', event => {
+      // TODO: multiple <vcf-anchor-navs>, one with no-history, one without.
+      this._toggleNoHistory(this.noHistory);
+    });
+  }
+
+  _toggleNoHistory(noHistory) {
+    if (noHistory) {
+      this._enableNoHistory();
+    } else {
+      this._disableNoHistory();
+    }
+  }
+
+  _disableNoHistory() {
+    if (!history.elementsWithNoHistory || !history.oldPushState) {
+      return;
+    }
+    const indexOfCurrent = history.elementsWithNoHistory.indexOf(this);
+    if (indexOfCurrent < 0) {
+      return;
+    }
+    history.elementsWithNoHistory.splice(indexOfCurrent, 1);
+    if (history.elementsWithNoHistory.length === 0) {
+      history.pushState = history.oldPushState;
+      history.oldPushState = null;
+    }
+  }
+
+  _enableNoHistory() {
+    if (!history.elementsWithNoHistory || history.elementsWithNoHistory.length === 0) {
+      history.elementsWithNoHistory = [this];
+      history.oldPushState = history.pushState;
+      history.pushState = function pushState() {
+        history.replaceState('', '');
+      };
+    } else {
+      history.elementsWithNoHistory.push(this);
+    }
+  }
+
+  _clearOldPushState() {
+    if (history.oldPushState) {
+      history.pushState = history.oldPushState;
+      history.oldPushState = null;
+    }
+  }
+
+  disconnectedCallback() {
+    this._clearOldPushState();
+    this._disableNoHistory();
+    super.disconnectedCallback();
   }
 
   _onNavFocus(e) {
