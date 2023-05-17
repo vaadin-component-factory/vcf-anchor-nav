@@ -1,7 +1,7 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin';
 import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
-import { smoothScrollPolyfill, stickyPolyfill } from '../lib/common-js-modules.esm';
+import { smoothScrollPolyfill, stickyPolyfill } from './common-js-modules.esm';
 import { ResizeObserver } from '@juggle/resize-observer';
 import '@vaadin/tabs/vaadin-tabs';
 import '@vaadin/tabs/vaadin-tab';
@@ -148,7 +148,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   static get version() {
-    return '23.3.0';
+    return '23.4.0';
   }
 
   static get properties() {
@@ -206,6 +206,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       noHistory: {
         type: Boolean,
         value: false,
+        reflectToAttribute: true,
         notify: true
       }
     };
@@ -270,7 +271,6 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       this.sections.forEach(section => section.removeAttribute('tabindex'));
     };
     this.addEventListener('no-history-changed', event => {
-      // TODO: multiple <vcf-anchor-navs>, one with no-history, one without.
       this._toggleNoHistory(this.noHistory);
     });
   }
@@ -284,7 +284,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _disableNoHistory() {
-    if (!history.elementsWithNoHistory || !history.oldPushState) {
+    if (!history.elementsWithNoHistory) {
       return;
     }
     const indexOfCurrent = history.elementsWithNoHistory.indexOf(this);
@@ -293,8 +293,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     }
     history.elementsWithNoHistory.splice(indexOfCurrent, 1);
     if (history.elementsWithNoHistory.length === 0) {
-      history.pushState = history.oldPushState;
-      history.oldPushState = null;
+      this._clearOldPushState();
     }
   }
 
@@ -302,10 +301,22 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     if (!history.elementsWithNoHistory || history.elementsWithNoHistory.length === 0) {
       history.elementsWithNoHistory = [this];
       history.oldPushState = history.pushState;
-      history.pushState = function pushState() {
-        history.replaceState('', '');
+      history.currentPathname = window.location.pathname;
+      history.pushState = function pushState(state, unused, url) {
+        let incomingPathname = null;
+        if (typeof url === 'string' || url instanceof String) {
+          incomingPathname = url;
+        } else if (typeof url === 'object' && !Array.isArray(url) && url !== null) {
+          incomingPathname = url.pathname;
+        }
+        if (incomingPathname != history.currentPathname) {
+          history.currentPathname = incomingPathname;
+          history.oldPushState(state, unused, url);
+        } else {
+          history.replaceState('', '');
+        }
       };
-    } else {
+    } else if (!history.elementsWithNoHistory.includes(this)) {
       history.elementsWithNoHistory.push(this);
     }
   }
@@ -321,6 +332,11 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     this._clearOldPushState();
     this._disableNoHistory();
     super.disconnectedCallback();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._toggleNoHistory(this.noHistory);
   }
 
   _onNavFocus(e) {
