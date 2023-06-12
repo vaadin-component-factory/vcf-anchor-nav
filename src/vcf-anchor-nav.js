@@ -1,7 +1,7 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin';
 import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
-import { smoothScrollPolyfill, stickyPolyfill } from './common-js-modules.esm';
+import { smoothScrollPolyfill, stickyPolyfill } from '../lib/common-js-modules.esm';
 import { ResizeObserver } from '@juggle/resize-observer';
 import '@vaadin/tabs/vaadin-tabs';
 import '@vaadin/tabs/vaadin-tab';
@@ -243,8 +243,6 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   ready() {
     super.ready();
-    // eslint-disable-next-line no-console
-    console.log('-----==');
     this._verticalTabs = false;
     // Add polyfills
     smoothScrollPolyfill();
