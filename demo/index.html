@@ -157,7 +157,9 @@
     </custom-style>
   </head>
   <body>
-    <vcf-anchor-nav fullscreen class="main hidden">
+
+    <vcf-anchor-nav fullscreen class="main hidden" no-history>
+      <p>Go to <a href="./foo.html">foo</a></p>
       <a id="api" slot="header" href="/api/#/elements/Vaadin.VcfAnchorNav">
         <vaadin-button theme="tertiary" class="nav-btn">
           <iron-icon icon="lumo:angle-right" slot="suffix"></iron-icon>
@@ -194,7 +196,7 @@
               }
             </style>
 
-            <vcf-anchor-nav id="basic" theme="expand-last" disable-preserve-on-refresh>
+            <vcf-anchor-nav id="basic" theme="expand-last" disable-preserve-on-refresh no-history>
               <h1 slot="header">Main Header</h1>
 
               <vcf-anchor-nav-section name="Introduction">
@@ -256,7 +258,7 @@
               }
             </style>
 
-            <vcf-anchor-nav id="fullscreen" theme="expand-last" disable-preserve-on-refresh>
+            <vcf-anchor-nav id="fullscreen" theme="expand-last" disable-preserve-on-refresh no-history>
               <vaadin-button slot="header">Toggle Fullscreen</vaadin-button>
               <vcf-anchor-nav-section>Section 1</vcf-anchor-nav-section>
               <vcf-anchor-nav-section>Section 2</vcf-anchor-nav-section>
@@ -313,7 +315,7 @@
               }
             </style>
 
-            <vcf-anchor-nav id="custom-tabs" theme="expand-last" disable-preserve-on-refresh>
+            <vcf-anchor-nav id="custom-tabs" theme="expand-last" disable-preserve-on-refresh no-history>
               <!-- Add your own <vaadin-tabs> to the "tabs" slot. -->
               <vaadin-tabs slot="tabs">
                 <!-- Create custom <vaadin-tab> with "id" equal to "tab-id" of the linked section. -->

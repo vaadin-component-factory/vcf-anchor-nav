@@ -137,7 +137,7 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   get navTab() {
-    return this.nav && this.nav.$.tabs.querySelector(`#${this.tabId || this.defaultTabId}`);
+    return this.nav && this.nav.$ && this.nav.$.tabs && this.nav.$.tabs.querySelector(`#${this.tabId || this.defaultTabId}`);
   }
 
   get url() {
@@ -175,7 +175,7 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   _onTabSlotChange() {
     const tab = this.tab;
-    if (this.nav && tab) {
+    if (this.nav && this.nav.$ && tab) {
       tab.removeAttribute('slot');
       this.tabId = tab.id;
       this.nav.$.tabs.appendChild(tab);
