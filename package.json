@@ -50,8 +50,7 @@
     "@vaadin/vaadin-lumo-styles": "^23.3.1",
     "@vaadin/vaadin-themable-mixin": "^23.3.1",
     "intersection-observer": "^0.10.0",
-    "smoothscroll-polyfill": "^0.4.4",
-    "stickyfilljs": "^2.1.0"
+    "smoothscroll-polyfill": "^0.4.4"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
