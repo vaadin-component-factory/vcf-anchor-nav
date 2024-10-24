@@ -137,7 +137,8 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   get navTab() {
-    return this.nav && this.nav.$ && this.nav.$.tabs && this.nav.$.tabs.querySelector(`#${this.tabId || this.defaultTabId}`);
+    const tabs = this.nav.querySelector('vaadin-tabs');
+    return this.nav && tabs && tabs.querySelector(`#${this.tabId || this.defaultTabId}`);
   }
 
   get url() {
@@ -175,10 +176,13 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   _onTabSlotChange() {
     const tab = this.tab;
+
     if (this.nav && this.nav.$ && tab) {
       tab.removeAttribute('slot');
       this.tabId = tab.id;
-      this.nav.$.tabs.appendChild(tab);
+
+      this.nav.querySelector('vaadin-tabs').appendChild(tab);
+
       this.nav._initTab(tab, this);
       this.nav._sortTabs();
     }

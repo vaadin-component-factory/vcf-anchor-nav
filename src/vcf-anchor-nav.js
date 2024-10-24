@@ -91,8 +91,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           background: var(--anchor-nav-inner-background);
         }
 
-        [part='tabs'],
-        ::slotted([part='tabs']) {
+        ::slotted(.tabs) {
           position: -webkit-sticky;
           position: sticky;
           top: 0 !important;
@@ -100,13 +99,11 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           z-index: 2;
         }
 
-        :host([has-header]) [part='tabs'],
-        :host([has-header]) ::slotted([part='tabs']) {
+        :host([has-header]) ::slotted(.tabs) {
           top: -1px !important;
         }
 
-        [part='tabs'][stuck]::after,
-        ::slotted([part='tabs'][stuck])::after {
+        ::slotted(.tabs[stuck])::after {
           content: ' ';
           position: absolute;
           width: 100%;
@@ -131,9 +128,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         <div id="header" part="header">
           <slot id="headerSlot" name="header"></slot>
         </div>
-        <slot id="tabsSlot" name="tabs">
-          <vaadin-tabs id="tabs" part="tabs"></vaadin-tabs>
-        </slot>
+        <slot id="tabsSlot" name="tabs"></slot>
         <slot id="slot"></slot>
       </div>
     `;
@@ -230,7 +225,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   get _tabHeight() {
-    return this._verticalTabs ? 0 : this.$.tabs.clientHeight;
+    const tabs = this.querySelector('vaadin-tabs');
+    return this._verticalTabs ? 0 : tabs.clientHeight;
   }
 
   get _expandLastHeight() {
@@ -241,16 +237,28 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     return !this.disablePreserveOnRefresh;
   }
 
+  _createVaadinTabs() {
+    const vaadinTabs = document.createElement('vaadin-tabs');
+    vaadinTabs.setAttribute('id', 'tabs');
+    vaadinTabs.setAttribute('slot', 'tabs');
+    vaadinTabs.classList.add('tabs');
+    this.appendChild(vaadinTabs);
+  }
+
   ready() {
     super.ready();
+    this._createVaadinTabs();
+
     this._verticalTabs = false;
     // Add polyfills
     smoothScrollPolyfill();
-    stickyPolyfill.add(this.$.tabs);
+    stickyPolyfill.add(this.querySelector('vaadin-tabs'));
+
     // Init observers
     this._initTabsStuckAttribute();
     this._initWindowResizeListener();
     this._initContainerResizeObserver();
+
     // Add slotchange listeners
     this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
     this.$.tabsSlot.addEventListener('slotchange', e => this._onTabsSlotChange(e));
@@ -351,7 +359,9 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         let tab = section.tab;
         if (!tab) {
           tab = document.createElement('vaadin-tab');
-          this.$.tabs.appendChild(tab);
+          Array.from(this.querySelectorAll('vaadin-tabs'))
+            .filter(el => el.parentElement == this)[0]
+            .appendChild(tab);
           this._initTab(tab, section);
         }
         section.removeEventListener('section-focus', this.onSectionFocus);
@@ -378,14 +388,17 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _onTabsSlotChange(e) {
-    const slottedTabsElement = e.target.assignedElements().filter(el => el.tagName.toUpperCase() === 'VAADIN-TABS')[0];
+    const slottedTabsElement = e.target
+      .assignedElements()
+      .filter(el => el.tagName.toUpperCase() === 'VAADIN-TABS' && !el.classList.contains('tabs'))[0];
+
     if (slottedTabsElement) {
-      const defaultTabs = Array.from(this.$.tabs.querySelectorAll('vaadin-tab'));
-      defaultTabs.forEach(tab => slottedTabsElement.appendChild(tab));
-      slottedTabsElement.setAttribute('part', 'tabs');
-      this.$.tabs.remove();
-      this.$.tabs = slottedTabsElement;
-      Array.from(slottedTabsElement.querySelectorAll('vaadin-tab')).forEach(tab => {
+      const defaultTabsElement = this.querySelector('#tabs');
+      const slottedTabs = Array.from(slottedTabsElement.querySelectorAll('vaadin-tab'));
+      slottedTabs.forEach(tab => defaultTabsElement.appendChild(tab));
+      slottedTabsElement.remove();
+
+      Array.from(defaultTabsElement.querySelectorAll('vaadin-tab')).forEach(tab => {
         const section = this.querySelector(`[tab-id="${tab.id}"]`);
         if (section) this._initTab(tab, section);
       });
@@ -418,7 +431,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   _sortTabs() {
     this.sections.forEach(section => {
-      if (section.navTab) this.$.tabs.appendChild(section.navTab);
+      if (section.navTab) this.querySelector('vaadin-tabs').appendChild(section.navTab);
     });
   }
 
@@ -513,7 +526,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
           threshold: 1
         }
       );
-      observer.observe(this.$.tabs);
+      observer.observe(this.querySelector('vaadin-tabs'));
     });
   }
 
@@ -540,22 +553,27 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _selectTab(section) {
-    this.$.tabs.querySelectorAll('vaadin-tab').forEach(tab => (tab.selected = false));
-    const tab = section.tab;
-    if (tab) tab.selected = true;
-    // Horizontally scroll tabs when selected changes
-    if (this.$.tabs.hasAttribute('overflow') && this.sections.length) {
-      const leftOffset = this.$.tabs.root.querySelector('[part="back-button"]').clientWidth * 2;
-      const topOffset = this.sections[0].offsetTop;
-      const scrollRatio = (this.sections[this.selectedIndex].offsetTop - topOffset) / (this.scrollHeight - topOffset);
-      const left = this.$.tabs.$.scroll.scrollWidth * scrollRatio;
-      this.$.tabs.$.scroll.scrollTo({
-        left: left && left - leftOffset,
-        behavior: this._firstTabSelect ? 'auto' : 'smooth'
-      });
-      this._firstTabSelect = false;
+    const tabs = this.querySelector('vaadin-tabs');
+
+    if (tabs) {
+      tabs.querySelectorAll('vaadin-tab').forEach(tab => (tab.selected = false));
+
+      const tab = section.tab;
+      if (tab) tab.selected = true;
+      // Horizontally scroll tabs when selected changes
+      if (tabs.hasAttribute('overflow') && this.sections.length) {
+        const leftOffset = tabs.root.querySelector('[part="back-button"]').clientWidth * 2;
+        const topOffset = this.sections[0].offsetTop;
+        const scrollRatio = (this.sections[this.selectedIndex].offsetTop - topOffset) / (this.scrollHeight - topOffset);
+        const left = tabs.$.scroll.scrollWidth * scrollRatio;
+        tabs.$.scroll.scrollTo({
+          left: left && left - leftOffset,
+          behavior: this._firstTabSelect ? 'auto' : 'smooth'
+        });
+        this._firstTabSelect = false;
+      }
+      this.dispatchEvent(new CustomEvent('selected-changed', { detail: { index: this.selectedIndex, id: this.selectedId } }));
     }
-    this.dispatchEvent(new CustomEvent('selected-changed', { detail: { index: this.selectedIndex, id: this.selectedId } }));
   }
 
   _getSectionIndex(sectionId) {
