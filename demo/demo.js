@@ -18,7 +18,7 @@ window.addEventListener('WebComponentsReady', () => {
     if (window.innerWidth > 768) {
       const codeContainerStyles = document.createElement('style');
       const copyVaadinButton = document.createElement('vaadin-button');
-      const copyIcon = document.createElement('iron-icon');
+      const copyIcon = document.createElement('vaadin-icon');
       // Custom <demo-snippet> styles
       element.shadowRoot.appendChild(codeContainerStyles);
       codeContainerStyles.innerHTML = mainCodeContainerStyles.innerHTML;
@@ -30,7 +30,7 @@ window.addEventListener('WebComponentsReady', () => {
       copyVaadinButton.addEventListener('click', () => {
         document
           .querySelectorAll('demo-snippet')
-          .forEach(element => element.shadowRoot.querySelector('iron-icon').setAttribute('icon', 'vcf-demo:copy'));
+          .forEach(element => element.shadowRoot.querySelector('vaadin-icon').setAttribute('icon', 'vcf-demo:copy'));
         copyButton.click();
         copyIcon.setAttribute('icon', 'lumo:checkmark');
       });
