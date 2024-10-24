@@ -1,12 +1,12 @@
 /* eslint-disable max-len */
 import { html } from '@polymer/polymer/polymer-element.js';
 import { registerStyles, css } from '@vaadin/vaadin-themable-mixin/register-styles.js';
-import '@polymer/iron-iconset-svg';
+import '@vaadin/vaadin-lumo-styles/vaadin-iconset.js'
 
 registerStyles(
   'vaadin-button',
   css`
-    [part] ::slotted(iron-icon[icon^='vcf-demo:']) {
+    [part] ::slotted(vaadin-icon[icon^='vcf-demo:']) {
       padding: 0.25em;
       box-sizing: border-box !important;
     }
@@ -14,7 +14,7 @@ registerStyles(
 );
 
 const template = html`
-  <iron-iconset-svg name="vcf-demo" size="16">
+  <vaadin-iconset name="vcf-demo" size="16">
     <svg>
       <defs>
         <g id="copy">
@@ -27,7 +27,7 @@ const template = html`
         </g>
       </defs>
     </svg>
-  </iron-iconset-svg>
+  </vaadin-iconset>
 `;
 
 document.head.appendChild(template.content);
