@@ -65,9 +65,7 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
       </style>
       <slot id="tabSlot" name="tab"></slot>
       <div id="header" part="header">
-        <slot name="header">
-          <h2 id="defaultHeader">[[name]]</h2>
-        </slot>
+        <slot name="header"></slot>
       </div>
       <div id="content" part="content">
         <slot></slot>
@@ -104,14 +102,29 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   ready() {
     super.ready();
+    this._createHeader();
     this.setAttribute('tabindex', '-1');
     this.setAttribute('role', 'region');
+    this.setAttribute('aria-labelledby', this.headerId);
     this.$.tabSlot.addEventListener('slotchange', e => this._onTabSlotChange(e));
     this.addEventListener('focus', e => {
       if (AnchorNavSectionElement.isSame(e.target)) {
         this.dispatchEvent(new CustomEvent('section-focus'));
       }
     });
+  }
+
+  _createHeader() {
+    const customHeader = this.querySelector('h2');
+    if (customHeader && customHeader.assignedSlot && customHeader.assignedSlot.name == 'header') {
+      customHeader.setAttribute('id', this.headerId);
+    } else {
+      const header = document.createElement('h2');
+      header.setAttribute('slot', 'header');
+      header.setAttribute('id', this.headerId);
+      header.textContent = this.name;
+      this.appendChild(header);
+    }
   }
 
   get nav() {
@@ -206,6 +219,10 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
 
   _setDefaultId() {
     if (!this.id) this.id = this.defaultId;
+  }
+
+  get headerId() {
+    return `header-${this.sectionIndex + 1}`;
   }
 }
 
