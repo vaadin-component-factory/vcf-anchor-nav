@@ -105,6 +105,7 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
   ready() {
     super.ready();
     this.setAttribute('tabindex', '-1');
+    this.setAttribute('role', 'region');
     this.$.tabSlot.addEventListener('slotchange', e => this._onTabSlotChange(e));
     this.addEventListener('focus', e => {
       if (AnchorNavSectionElement.isSame(e.target)) {
