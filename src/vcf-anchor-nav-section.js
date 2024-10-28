@@ -53,7 +53,6 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
           border-bottom: var(--anchor-nav-section-border-width) solid var(--anchor-nav-section-border-color);
         }
 
-        #defaultHeader,
         ::slotted([slot='header']) {
           margin: 0;
           padding: var(--lumo-space-m);
@@ -115,8 +114,8 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
   }
 
   _createHeader() {
-    const customHeader = this.querySelector('h2');
-    if (customHeader && customHeader.assignedSlot && customHeader.assignedSlot.name == 'header') {
+    const customHeader = this.querySelector('[slot="header"]');
+    if (customHeader) {
       customHeader.setAttribute('id', this.headerId);
     } else {
       const header = document.createElement('h2');
