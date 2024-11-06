@@ -14,6 +14,12 @@ Web Component for easily creating layouts with sticky anchor navigation tabs and
 
 [Live demo ↗](https://vcf-anchor-nav.netlify.com) | [API documentation ↗](https://vcf-anchor-nav.netlify.com/api/#/elements/Vaadin.VcfAnchorNav)
 
+## Compatibility
+
+- Version 1.x.x -> Vaadin 14+
+- Version 2.x.x -> Vaadin 23+
+- Version 3.x.x -> Vaadin 24.5.x (improved accessibility)
+
 ## Installation
 
 Install `vcf-anchor-nav`:
