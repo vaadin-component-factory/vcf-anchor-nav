@@ -26,10 +26,12 @@ import '@vaadin/tabs/vaadin-tab';
  *
  * Custom property | Description | Default
  * ----------------|-------------|-------------
- * `--anchor-nav-inner-max-width` | `max-width` of "container" part. | `auto`
- * `--anchor-nav-inner-background` | `background` of "container" part. | `#ffffff`
- * `--anchor-nav-inner-padding` | `padding` of "container" part. | `0 0 20vh 0`
- * `--anchor-nav-tabs-stuck-box-shadow` | `box-shadow` of "tabs" part when stuck to top of viewport. | `0 4px 5px -6px rgba(0, 0, 0, 0.4)`
+ * `--anchor-nav-header-padding` | `padding` of the slotted "header" content. | `0 1rem`
+ * `--anchor-nav-inner-max-width` | `max-width` of the "container" part. | `auto`
+ * `--anchor-nav-inner-background` | `background` of the "container" part. | `#ffffff`
+ * `--anchor-nav-inner-padding` | `padding` of the "container" part. | `0`
+ * `--anchor-nav-tabs-background` | `background` of the slotted "tabs" content. | `#fff`
+ * `--anchor-nav-tabs-stuck-box-shadow` | `box-shadow` of slotted "tabs" content when stuck to top of viewport. | `0 4px 5px -6px rgba(0, 0, 0, 0.4)`
  *
  * The following shadow DOM parts are available for styling:
  *
@@ -53,9 +55,11 @@ export class AnchorNavElement extends ElementMixin(LitElement) {
         width: 100%;
         height: 100%;
         max-height: 100vh;
+        --anchor-nav-header-padding: 0 1rem;
         --anchor-nav-inner-max-width: auto;
-        --anchor-nav-inner-background: var(--lumo-base-color);
+        --anchor-nav-inner-background: #fff;
         --anchor-nav-inner-padding: 0;
+        --anchor-nav-tabs-background: #fff;
         --anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
         /*
              * Chrome scrollbar z-index bugfix
@@ -90,7 +94,7 @@ export class AnchorNavElement extends ElementMixin(LitElement) {
         position: -webkit-sticky;
         position: sticky;
         top: 0 !important;
-        background: var(--lumo-base-color);
+        background: var(--anchor-nav-tabs-background);
         z-index: 2;
       }
 
@@ -112,7 +116,7 @@ export class AnchorNavElement extends ElementMixin(LitElement) {
       }
 
       ::slotted([slot='header']) {
-        padding: 0 var(--lumo-space-m);
+        padding: var(--anchor-nav-header-padding);
       }
 
       :host([theme~='expand-last']) ::slotted(vcf-anchor-nav-section:last-of-type) {
