@@ -15,6 +15,13 @@ Web Component for easily creating layouts with sticky anchor navigation tabs and
 ## Important information about versioning
 **Component versions 23.x were deprecated in order to follow Semanting Versioning practices. Please use latest version 2.x for Vaadin 23+ and version 3.x for Vaadin 24.5.**  
 
+## Since version 4.0.0
+
+- The component has been migrated to Lit
+- By default, the component uses a minimal set of functional styles that provide a foundation for a custom theme.
+  - To use the component with the Vaadin Lumo theme, import the component's Lumo theme from `@vaadin-component-factory/vcf-anchor-nav/theme/lumo.css`.
+- `ThemableMixin` has been removed from the component, and injecting styles into the component's shadow root using `registerStyles` is no longer supported. Use global CSS to style the component using part names and CSS variables instead.
+
 ## Compatibility
 
 - Version 1.x.x -> Vaadin 14+

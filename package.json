@@ -16,7 +16,7 @@
     "vcf-anchor-nav",
     "web-components",
     "web-component",
-    "polymer"
+    "lit"
   ],
   "scripts": {
     "test": "wct",
@@ -42,11 +42,8 @@
     ]
   },
   "dependencies": {
-    "@polymer/polymer": "^3.0.0",
     "@vaadin/component-base": "^25.0.0-beta1",
-    "@vaadin/tabs": "^25.0.0-beta1",
-    "@vaadin/vaadin-lumo-styles": "^25.0.0-beta1",
-    "@vaadin/vaadin-themable-mixin": "^25.0.0-beta1"
+    "@vaadin/tabs": "^25.0.0-beta1"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
@@ -58,6 +55,7 @@
     "@vaadin-component-factory/vcf-element-util": "^0.2.8",
     "@vaadin/button": "^25.0.0-beta1",
     "@vaadin/text-field": "^25.0.0-beta1",
+    "@vaadin/vaadin-lumo-styles": "^25.0.0-beta1",
     "@web/dev-server": "^0.4.6",
     "@webcomponents/webcomponentsjs": "^2.0.0",
     "babel-eslint": "^10.0.2",
