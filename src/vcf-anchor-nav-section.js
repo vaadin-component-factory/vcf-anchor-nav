@@ -16,7 +16,9 @@ import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
  * Custom property | Description | Default
  * ----------------|-------------|-------------
  * `--anchor-nav-section-border-width` | `border-width` of section. | `0`
- * `--anchor-nav-section-border-color` | `border-color` of section. | `var(--lumo-contrast-10pct)`
+ * `--anchor-nav-section-border-color` | `border-color` of section. | `#666`
+ * `--anchor-nav-section-header-padding` | `padding` of the "header" part. | `1rem`
+ * `--anchor-nav-section-content-padding` | `padding` of the "content" part. | `1rem`
  *
  * The following shadow DOM parts are available for styling:
  *
@@ -42,7 +44,9 @@ class AnchorNavSectionElement extends ElementMixin(LitElement) {
     return css`
       :host {
         --anchor-nav-section-border-width: 0;
-        --anchor-nav-section-border-color: var(--lumo-contrast-10pct);
+        --anchor-nav-section-border-color: #666;
+        --anchor-nav-section-header-padding: 1rem;
+        --anchor-nav-section-content-padding: 1rem;
         outline: none;
       }
 
@@ -52,11 +56,11 @@ class AnchorNavSectionElement extends ElementMixin(LitElement) {
 
       ::slotted([slot='header']) {
         margin: 0;
-        padding: var(--lumo-space-m);
+        padding: var(--anchor-nav-section-header-padding);
       }
 
       #content {
-        padding: var(--lumo-space-m);
+        padding: var(--anchor-nav-section-content-padding);
       }
     `;
   }
