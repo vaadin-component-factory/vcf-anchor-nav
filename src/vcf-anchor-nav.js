@@ -1,5 +1,4 @@
-import { html, PolymerElement } from '@polymer/polymer/polymer-element';
-import { ThemableMixin } from '@vaadin/vaadin-themable-mixin';
+import { LitElement, html, css } from 'lit';
 import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
 import '@vaadin/tabs/vaadin-tabs';
 import '@vaadin/tabs/vaadin-tab';
@@ -42,93 +41,83 @@ import '@vaadin/tabs/vaadin-tab';
  *
  * @memberof Vaadin
  * @mixes ElementMixin
- * @mixes ThemableMixin
  * @demo demo/index.html
  */
-export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)) {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-          overflow: auto;
-          position: relative;
-          width: 100%;
-          height: 100%;
-          max-height: 100vh;
-          --anchor-nav-inner-max-width: auto;
-          --anchor-nav-inner-background: var(--lumo-base-color);
-          --anchor-nav-inner-padding: 0;
-          --anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
-          /*
-           * Chrome scrollbar z-index bugfix
-           * https://github.com/PolymerElements/iron-list/issues/137#issuecomment-176457768
-           */
-          will-change: transform;
-          -webkit-overflow-scrolling: touch;
-        }
+export class AnchorNavElement extends ElementMixin(LitElement) {
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+        overflow: auto;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        --anchor-nav-inner-max-width: auto;
+        --anchor-nav-inner-background: var(--lumo-base-color);
+        --anchor-nav-inner-padding: 0;
+        --anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
+        /*
+             * Chrome scrollbar z-index bugfix
+             * https://github.com/PolymerElements/iron-list/issues/137#issuecomment-176457768
+             */
+        will-change: transform;
+        -webkit-overflow-scrolling: touch;
+      }
 
-        :host([fullscreen]) {
-          height: 100vh !important;
-          position: fixed;
-          top: 0;
-          bottom: 0;
-          right: 0;
-          left: 0;
-          z-index: 1;
-          transition: all 0.2s;
-        }
+      :host([fullscreen]) {
+        height: 100vh !important;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        z-index: 1;
+        transition: all 0.2s;
+      }
 
-        [part='container'] {
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-          margin: auto;
-          max-width: var(--anchor-nav-inner-max-width);
-          padding: var(--anchor-nav-inner-padding);
-          background: var(--anchor-nav-inner-background);
-        }
+      [part='container'] {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin: auto;
+        max-width: var(--anchor-nav-inner-max-width);
+        padding: var(--anchor-nav-inner-padding);
+        background: var(--anchor-nav-inner-background);
+      }
 
-        ::slotted(.tabs) {
-          position: -webkit-sticky;
-          position: sticky;
-          top: 0 !important;
-          background: var(--lumo-base-color);
-          z-index: 2;
-        }
+      ::slotted(.tabs) {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0 !important;
+        background: var(--lumo-base-color);
+        z-index: 2;
+      }
 
-        :host([has-header]) ::slotted(.tabs) {
-          top: -1px !important;
-        }
+      :host([has-header]) ::slotted(.tabs) {
+        top: -1px !important;
+      }
 
-        ::slotted(.tabs[stuck])::after {
-          content: ' ';
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          box-shadow: var(--anchor-nav-tabs-stuck-box-shadow);
-          z-index: -1;
-        }
+      ::slotted(.tabs[stuck])::after {
+        content: ' ';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        box-shadow: var(--anchor-nav-tabs-stuck-box-shadow);
+        z-index: -1;
+      }
 
-        ::slotted(*) {
-          flex: 0 0 auto;
-        }
+      ::slotted(*) {
+        flex: 0 0 auto;
+      }
 
-        ::slotted([slot='header']) {
-          padding: 0 var(--lumo-space-m);
-        }
+      ::slotted([slot='header']) {
+        padding: 0 var(--lumo-space-m);
+      }
 
-        :host([theme~='expand-last']) ::slotted(vcf-anchor-nav-section:last-of-type) {
-          min-height: var(--_expand-last-height);
-        }
-      </style>
-      <div id="container" part="container">
-        <div id="header" part="header">
-          <slot id="headerSlot" name="header"></slot>
-        </div>
-        <slot id="tabsSlot" name="tabs"></slot>
-        <slot id="slot"></slot>
-      </div>
+      :host([theme~='expand-last']) ::slotted(vcf-anchor-nav-section:last-of-type) {
+        min-height: var(--_expand-last-height);
+      }
     `;
   }
 
@@ -152,7 +141,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
        */
       selectedId: {
         type: String,
-        observer: '_selectedIdChanged'
+        attribute: 'selected-id'
       },
 
       /**
@@ -161,8 +150,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
        */
       selectedIndex: {
         type: Number,
-        value: 0,
-        observer: '_selectedIndexChanged'
+        attribute: 'selected-index'
       },
 
       /**
@@ -171,7 +159,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
        */
       fullscreen: {
         type: Boolean,
-        reflectToAttribute: true
+        reflect: true
       },
 
       /**
@@ -180,7 +168,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
        */
       disablePreserveOnRefresh: {
         type: Boolean,
-        value: false
+        attribute: 'disable-preserve-on-refresh'
       },
 
       /**
@@ -189,7 +177,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
        */
       smoothScroll: {
         type: Boolean,
-        value: true
+        attribute: 'smooth-scroll'
       },
       /**
        * Set to true to disable history of internal navigation so that
@@ -198,11 +186,20 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
        */
       noHistory: {
         type: Boolean,
-        value: false,
-        reflectToAttribute: true,
-        notify: true
+        reflect: true,
+        attribute: 'no-history'
       }
     };
+  }
+
+  constructor() {
+    super();
+    this.selectedId = '';
+    this.selectedIndex = 0;
+    this.fullscreen = false;
+    this.disablePreserveOnRefresh = false;
+    this.smoothScroll = true;
+    this.noHistory = false;
   }
 
   /**
@@ -219,7 +216,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
    * @returns {HTMLElement}
    */
   get header() {
-    return this.$.headerSlot.assignedNodes()[0] || null;
+    const headerSlot = this.shadowRoot && this.shadowRoot.querySelector('#headerSlot');
+    return (headerSlot && headerSlot.assignedNodes()[0]) || null;
   }
 
   get _tabHeight() {
@@ -243,8 +241,7 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     this.appendChild(vaadinTabs);
   }
 
-  ready() {
-    super.ready();
+  firstUpdated() {
     this._createVaadinTabs();
 
     this._verticalTabs = false;
@@ -255,9 +252,13 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     this._initContainerResizeObserver();
 
     // Add slotchange listeners
-    this.$.slot.addEventListener('slotchange', () => this._onSlotChange());
-    this.$.tabsSlot.addEventListener('slotchange', e => this._onTabsSlotChange(e));
-    this.$.headerSlot.addEventListener('slotchange', () => this._onHeaderSlotChange());
+    const slotElement = this.shadowRoot.querySelector('#slot');
+    const tabsSlotElement = this.shadowRoot.querySelector('#tabsSlot');
+    const headerSlotElement = this.shadowRoot.querySelector('#headerSlot');
+
+    slotElement.addEventListener('slotchange', () => this._onSlotChange());
+    tabsSlotElement.addEventListener('slotchange', e => this._onTabsSlotChange(e));
+    headerSlotElement.addEventListener('slotchange', () => this._onHeaderSlotChange());
     this._toggleNoHistory(this.noHistory);
 
     // Add popstate listener
@@ -274,6 +275,28 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
     this.addEventListener('no-history-changed', event => {
       this._toggleNoHistory(this.noHistory);
     });
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+    if (changedProperties.has('selectedId')) {
+      this._selectedIdChanged(this.selectedId);
+    }
+    if (changedProperties.has('selectedIndex')) {
+      this._selectedIndexChanged(this.selectedIndex);
+    }
+  }
+
+  render() {
+    return html`
+      <div id="container" part="container">
+        <div id="header" part="header">
+          <slot id="headerSlot" name="header"></slot>
+        </div>
+        <slot id="tabsSlot" name="tabs"></slot>
+        <slot id="slot"></slot>
+      </div>
+    `;
   }
 
   _toggleNoHistory(noHistory) {
@@ -457,7 +480,8 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
         }
       });
     });
-    observer.observe(this.$.container);
+    const container = this.shadowRoot.querySelector('#container');
+    if (container) observer.observe(container);
   }
 
   _initWindowResizeListener() {
@@ -557,14 +581,18 @@ export class AnchorNavElement extends ElementMixin(ThemableMixin(PolymerElement)
       if (tab) tab.selected = true;
       // Horizontally scroll tabs when selected changes
       if (tabs.hasAttribute('overflow') && this.sections.length) {
-        const leftOffset = tabs.root.querySelector('[part="back-button"]').clientWidth * 2;
+        const scrollElement = tabs.shadowRoot && tabs.shadowRoot.querySelector('[part="tabs"]');
+        const backButton = tabs.shadowRoot && tabs.shadowRoot.querySelector('[part="back-button"]');
+        const leftOffset = backButton ? backButton.clientWidth * 2 : 0;
         const topOffset = this.sections[0].offsetTop;
         const scrollRatio = (this.sections[this.selectedIndex].offsetTop - topOffset) / (this.scrollHeight - topOffset);
-        const left = tabs.$.scroll.scrollWidth * scrollRatio;
-        tabs.$.scroll.scrollTo({
-          left: left && left - leftOffset,
-          behavior: this._firstTabSelect ? 'auto' : 'smooth'
-        });
+        if (scrollElement) {
+          const left = scrollElement.scrollWidth * scrollRatio;
+          scrollElement.scrollTo({
+            left: left && left - leftOffset,
+            behavior: this._firstTabSelect ? 'auto' : 'smooth'
+          });
+        }
         this._firstTabSelect = false;
       }
       this.dispatchEvent(new CustomEvent('selected-changed', { detail: { index: this.selectedIndex, id: this.selectedId } }));
