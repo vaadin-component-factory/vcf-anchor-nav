@@ -3,7 +3,6 @@ import '@polymer/iron-demo-helpers/demo-snippet';
 import '@vaadin/button';
 import '@vaadin/text-field';
 import '@vaadin/vaadin-lumo-styles/icons';
-import '@vaadin/vaadin-lumo-styles/typography';
 import '../vcf-anchor-nav';
 import './demo-icons';
 
