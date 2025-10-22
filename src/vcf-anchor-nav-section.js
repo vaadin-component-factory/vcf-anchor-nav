@@ -1,5 +1,4 @@
-import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
-import { ThemableMixin } from '@vaadin/vaadin-themable-mixin';
+import { LitElement, html, css } from 'lit';
 import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
 
 /**
@@ -28,10 +27,9 @@ import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
  *
  * @memberof Vaadin
  * @mixes ElementMixin
- * @mixes ThemableMixin
  * @demo demo/index.html
  */
-class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)) {
+class AnchorNavSectionElement extends ElementMixin(LitElement) {
   static get is() {
     return 'vcf-anchor-nav-section';
   }
@@ -40,35 +38,26 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
     return el.tagName === `${AnchorNavSectionElement.is}`.toUpperCase();
   }
 
-  static get template() {
-    return html`
-      <style>
-        :host {
-          --anchor-nav-section-border-width: 0;
-          --anchor-nav-section-border-color: var(--lumo-contrast-10pct);
-          outline: none;
-        }
+  static get styles() {
+    return css`
+      :host {
+        --anchor-nav-section-border-width: 0;
+        --anchor-nav-section-border-color: var(--lumo-contrast-10pct);
+        outline: none;
+      }
 
-        :host(:not(:last-of-type)) {
-          border-bottom: var(--anchor-nav-section-border-width) solid var(--anchor-nav-section-border-color);
-        }
+      :host(:not(:last-of-type)) {
+        border-bottom: var(--anchor-nav-section-border-width) solid var(--anchor-nav-section-border-color);
+      }
 
-        ::slotted([slot='header']) {
-          margin: 0;
-          padding: var(--lumo-space-m);
-        }
+      ::slotted([slot='header']) {
+        margin: 0;
+        padding: var(--lumo-space-m);
+      }
 
-        #content {
-          padding: var(--lumo-space-m);
-        }
-      </style>
-      <slot id="tabSlot" name="tab"></slot>
-      <div id="header" part="header">
-        <slot name="header"></slot>
-      </div>
-      <div id="content" part="content">
-        <slot></slot>
-      </div>
+      #content {
+        padding: var(--lumo-space-m);
+      }
     `;
   }
 
@@ -80,8 +69,7 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
        * @type {String}
        */
       name: {
-        type: String,
-        observer: '_nameChanged'
+        type: String
       },
       /**
        * Id of corresponding tab element.
@@ -89,28 +77,52 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
        */
       tabId: {
         type: String,
-        reflectToAttribute: true
+        reflect: true,
+        attribute: 'tab-id'
       }
     };
   }
 
   constructor() {
     super();
-    this.name = this.name || this.defaultName;
+    this.name = '';
+    this.tabId = '';
   }
 
-  ready() {
-    super.ready();
+  render() {
+    return html`
+      <slot id="tabSlot" name="tab"></slot>
+      <div id="header" part="header">
+        <slot name="header"></slot>
+      </div>
+      <div id="content" part="content">
+        <slot></slot>
+      </div>
+    `;
+  }
+
+  firstUpdated() {
+    this.name = this.name || this.defaultName;
     this._createHeader();
     this.setAttribute('tabindex', '-1');
     this.setAttribute('role', 'region');
     this.setAttribute('aria-labelledby', this.headerId);
-    this.$.tabSlot.addEventListener('slotchange', e => this._onTabSlotChange(e));
+
+    const tabSlot = this.shadowRoot.querySelector('#tabSlot');
+    tabSlot.addEventListener('slotchange', e => this._onTabSlotChange(e));
+
     this.addEventListener('focus', e => {
       if (AnchorNavSectionElement.isSame(e.target)) {
         this.dispatchEvent(new CustomEvent('section-focus'));
       }
     });
+  }
+
+  updated(changedProperties) {
+    super.updated(changedProperties);
+    if (changedProperties.has('name')) {
+      this._nameChanged(this.name);
+    }
   }
 
   _createHeader() {
@@ -190,8 +202,9 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
   _onTabSlotChange() {
     const tab = this.tab;
 
-    if (this.nav && this.nav.$ && tab) {
+    if (this.nav && tab) {
       tab.removeAttribute('slot');
+      tab.__isCustomTab = true;
       this.tabId = tab.id;
 
       this.nav.querySelector('vaadin-tabs').appendChild(tab);
@@ -205,7 +218,7 @@ class AnchorNavSectionElement extends ElementMixin(ThemableMixin(PolymerElement)
     // Set default tab
     this._setDefaultId();
     const tab = this.tab;
-    if (tab && tab.id === this.defaultTabId) {
+    if (tab && !tab.__isCustomTab && tab.id === this.defaultTabId) {
       let a = tab.querySelector('a');
       if (!a) {
         const url = new URL(location);
