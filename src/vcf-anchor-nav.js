@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
+import { ThemeDetectionMixin } from '@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin';
 import '@vaadin/tabs/vaadin-tabs';
 import '@vaadin/tabs/vaadin-tab';
 
@@ -43,9 +44,10 @@ import '@vaadin/tabs/vaadin-tab';
  *
  * @memberof Vaadin
  * @mixes ElementMixin
+ * @mixes ThemeDetectionMixin
  * @demo demo/index.html
  */
-export class AnchorNavElement extends ElementMixin(LitElement) {
+export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElement)) {
   static get styles() {
     return css`
       :host {
@@ -121,6 +123,14 @@ export class AnchorNavElement extends ElementMixin(LitElement) {
 
       :host([theme~='expand-last']) ::slotted(vcf-anchor-nav-section:last-of-type) {
         min-height: var(--_expand-last-height);
+      }
+
+      /* Lumo theme */
+
+      :host([data-application-theme='lumo']) {
+        --anchor-nav-header-padding: 0 var(--lumo-space-m);
+        --anchor-nav-inner-background: var(--lumo-base-color);
+        --anchor-nav-tabs-background: var(--lumo-base-color);
       }
     `;
   }
