@@ -63,10 +63,8 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
         --anchor-nav-inner-padding: 0;
         --anchor-nav-tabs-background: #fff;
         --anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
-        /*
-             * Chrome scrollbar z-index bugfix
-             * https://github.com/PolymerElements/iron-list/issues/137#issuecomment-176457768
-             */
+        /* Chrome scrollbar z-index bugfix
+        https://github.com/PolymerElements/iron-list/issues/137#issuecomment-176457768 */
         will-change: transform;
         -webkit-overflow-scrolling: touch;
       }
