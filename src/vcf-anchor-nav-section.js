@@ -46,7 +46,7 @@ class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElemen
     return css`
       :host {
         --anchor-nav-section-border-width: 0;
-        --anchor-nav-section-border-color: #666;
+        --anchor-nav-section-border-color: var(--vaadin-border-color-secondary);
         --anchor-nav-section-header-padding: 1rem;
         --anchor-nav-section-content-padding: 1rem;
         outline: none;
