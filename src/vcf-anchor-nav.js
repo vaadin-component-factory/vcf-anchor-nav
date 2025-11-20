@@ -59,10 +59,10 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
         max-height: 100vh;
         --anchor-nav-header-padding: 0 1rem;
         --anchor-nav-inner-max-width: auto;
-        --anchor-nav-inner-background: #fff;
+        --anchor-nav-inner-background: var(--vaadin-background-color);
         --anchor-nav-inner-padding: 0;
-        --anchor-nav-tabs-background: #fff;
-        --anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px rgba(0, 0, 0, 0.4);
+        --anchor-nav-tabs-background: var(--vaadin-background-color);
+        --anchor-nav-tabs-stuck-box-shadow: 0 1px 0px 0px var(--vaadin-border-color-secondary);
         /* Chrome scrollbar z-index bugfix
         https://github.com/PolymerElements/iron-list/issues/137#issuecomment-176457768 */
         will-change: transform;
@@ -96,6 +96,7 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
         top: 0 !important;
         background: var(--anchor-nav-tabs-background);
         z-index: 2;
+        padding-bottom: var(--vaadin-gap-s);
       }
 
       :host([has-header]) ::slotted(.tabs) {
@@ -129,6 +130,24 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
         --anchor-nav-header-padding: 0 var(--lumo-space-m);
         --anchor-nav-inner-background: var(--lumo-base-color);
         --anchor-nav-tabs-background: var(--lumo-base-color);
+        --anchor-nav-tabs-stuck-box-shadow: 0 4px 5px -6px var(--lumo-shade-40pct);
+      }
+
+      :host([data-application-theme='lumo']) ::slotted(.tabs) {
+        padding-bottom: 0;
+      }
+
+      /* Aura theme */
+
+      :host([data-application-theme='aura']) {
+        --anchor-nav-tabs-background: var(--vaadin-background-container);
+        --anchor-nav-tabs-stuck-box-shadow: none;
+      }
+
+      :host([data-application-theme='aura']) ::slotted(vaadin-tabs) {
+        background: var(--anchor-nav-tabs-background) !important;
+        -webkit-backdrop-filter: var(--aura-overlay-backdrop-filter);
+        backdrop-filter: var(--aura-overlay-backdrop-filter);
       }
     `;
   }
