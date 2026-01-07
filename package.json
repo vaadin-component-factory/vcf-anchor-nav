@@ -41,9 +41,9 @@
     ]
   },
   "dependencies": {
-    "@vaadin/component-base": "^25.0.0-beta4",
-    "@vaadin/tabs": "^25.0.0-beta4",
-    "@vaadin/vaadin-themable-mixin": "^25.0.0-beta4"
+    "@vaadin/component-base": "^25.0.0",
+    "@vaadin/tabs": "^25.0.0",
+    "@vaadin/vaadin-themable-mixin": "^25.0.0"
   },
   "devDependencies": {
     "@polymer/iron-component-page": "^4.0.1",
@@ -53,9 +53,9 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@web/rollup-plugin-html": "^2.3.0",
     "@vaadin-component-factory/vcf-element-util": "^0.2.8",
-    "@vaadin/button": "^25.0.0-beta4",
-    "@vaadin/text-field": "^25.0.0-beta4",
-    "@vaadin/vaadin-lumo-styles": "^25.0.0-beta4",
+    "@vaadin/button": "^25.0.0",
+    "@vaadin/text-field": "^25.0.0",
+    "@vaadin/vaadin-lumo-styles": "^25.0.0",
     "@web/dev-server": "^0.4.6",
     "@webcomponents/webcomponentsjs": "^2.0.0",
     "chai": "^4.2.0",
