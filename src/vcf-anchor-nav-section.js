@@ -99,7 +99,7 @@ class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElemen
 
   constructor() {
     super();
-    this.name = '';
+    this.name = this.name || '';
     this.tabId = '';
   }
 
@@ -115,8 +115,17 @@ class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElemen
     `;
   }
 
+  willUpdate(changedProperties) {
+    // Set defaults before update to avoid scheduling a new update
+    if (changedProperties.has('name') || !this.name) {
+      this.name = this.name || this.defaultName;
+    }
+    if (!this.id) {
+      this.id = this.defaultId;
+    }
+  }
+
   firstUpdated() {
-    this.name = this.name || this.defaultName;
     this._createHeader();
     this.setAttribute('tabindex', '-1');
     this.setAttribute('role', 'region');
@@ -187,8 +196,7 @@ class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElemen
   }
 
   get defaultTabId() {
-    this._setDefaultId();
-    return `${this.id}-tab`;
+    return `${this.id || this.defaultId}-tab`;
   }
 
   get sectionIndex() {
@@ -230,7 +238,6 @@ class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElemen
 
   _nameChanged(name) {
     // Set default tab
-    this._setDefaultId();
     const tab = this.tab;
     if (tab && !tab.__isCustomTab && tab.id === this.defaultTabId) {
       let a = tab.querySelector('a');
@@ -241,10 +248,6 @@ class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElemen
       }
       a.innerText = name;
     }
-  }
-
-  _setDefaultId() {
-    if (!this.id) this.id = this.defaultId;
   }
 
   get headerId() {
