@@ -26,6 +26,7 @@ Web Component for easily creating layouts with sticky anchor navigation tabs and
 - Version 1.x.x -> Vaadin 14+
 - Version 2.x.x -> Vaadin 23+
 - Version 3.x.x -> Vaadin 24.5.x (improved accessibility)
+- Version 4.x.x -> Vaadin 25
 
 ## Installation
 
@@ -66,7 +67,7 @@ Add `<vcf-anchor-nav>` element and `<vcf-anchor-nav-section>`s to the page.
 
 ## Server-side API
 
-This is the client-side (Polymer 3) web component. If you are looking for the server-side (Java) API for the Vaadin Platform, it can be found here: [Anchor Nav](https://vaadin.com/directory/component/anchor-nav-for-flow)
+This is the client-side web component. If you are looking for the server-side (Java) API for the Vaadin Platform, it can be found here: [Anchor Nav](https://vaadin.com/directory/component/anchor-nav-for-flow)
 
 ## License
 
