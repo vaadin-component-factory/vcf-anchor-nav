@@ -310,12 +310,16 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
 
   updated(changedProperties) {
     super.updated(changedProperties);
-    if (changedProperties.has('selectedId')) {
-      this._selectedIdChanged(this.selectedId);
-    }
-    if (changedProperties.has('selectedIndex')) {
-      this._selectedIndexChanged(this.selectedIndex);
-    }
+    // Defer property synchronization to avoid "update during update" warning
+    // This ensures these calls happen after the current update cycle completes
+    Promise.resolve().then(() => {
+      if (changedProperties.has('selectedId')) {
+        this._selectedIdChanged(this.selectedId);
+      }
+      if (changedProperties.has('selectedIndex')) {
+        this._selectedIndexChanged(this.selectedIndex);
+      }
+    });
   }
 
   render() {
@@ -666,7 +670,7 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
   _selectedIdChanged(selectedId) {
     if (selectedId) {
       const selectedIndex = this._getSectionIndex(selectedId);
-      if (this.selectedIndex !== selectedIndex) {
+      if (this.selectedIndex !== selectedIndex && selectedIndex !== undefined) {
         const section = this.querySelector(`#${selectedId}`);
         this._selectTab(section);
         this.selectedIndex = selectedIndex;
@@ -676,9 +680,12 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
 
   _selectedIndexChanged(selectedIndex) {
     const section = this.sections[selectedIndex];
-    if (section && this.selectedId !== section.id) {
+    if (section) {
       this._selectTab(section);
-      if (section.id) this.selectedId = section.id;
+      // Only update selectedId if it's different to prevent circular updates
+      if (section.id && this.selectedId !== section.id) {
+        this.selectedId = section.id;
+      }
     }
   }
 
