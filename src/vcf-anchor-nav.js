@@ -251,8 +251,20 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
     return (headerSlot && headerSlot.assignedNodes()[0]) || null;
   }
 
+  /**
+   * Returns the nav's own `vaadin-tabs` element.
+   *
+   * Scoped to a direct child with `slot="tabs"` so it never matches a
+   * `vaadin-tabs` slotted inside a section's content (which would otherwise
+   * be picked up by a plain `querySelector('vaadin-tabs')` in tree order).
+   * @returns {HTMLElement}
+   */
+  get _tabs() {
+    return this.querySelector(':scope > vaadin-tabs[slot="tabs"]');
+  }
+
   get _tabHeight() {
-    const tabs = this.querySelector('vaadin-tabs');
+    const tabs = this._tabs;
     return this._verticalTabs ? 0 : tabs.clientHeight;
   }
 
@@ -412,9 +424,7 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
         let tab = section.tab;
         if (!tab) {
           tab = document.createElement('vaadin-tab');
-          Array.from(this.querySelectorAll('vaadin-tabs'))
-            .filter(el => el.parentElement == this)[0]
-            .appendChild(tab);
+          this._tabs.appendChild(tab);
           this._initTab(tab, section);
         }
         section.removeEventListener('section-focus', this.onSectionFocus);
@@ -484,7 +494,7 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
 
   _sortTabs() {
     this.sections.forEach(section => {
-      if (section.navTab) this.querySelector('vaadin-tabs').appendChild(section.navTab);
+      if (section.navTab) this._tabs.appendChild(section.navTab);
     });
   }
 
@@ -580,7 +590,7 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
           threshold: 1
         }
       );
-      observer.observe(this.querySelector('vaadin-tabs'));
+      observer.observe(this._tabs);
     });
   }
 
@@ -607,10 +617,10 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
   }
 
   _selectTab(section) {
-    const tabs = this.querySelector('vaadin-tabs');
+    const tabs = this._tabs;
 
     if (tabs) {
-      tabs.querySelectorAll('vaadin-tab').forEach(tab => (tab.selected = false));
+      tabs.querySelectorAll(':scope > vaadin-tab').forEach(tab => (tab.selected = false));
 
       const tab = section.tab;
       if (tab) tab.selected = true;

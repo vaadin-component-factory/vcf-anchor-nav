@@ -185,7 +185,7 @@ class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElemen
   }
 
   get navTab() {
-    const tabs = this.nav.querySelector('vaadin-tabs');
+    const tabs = this.nav && this.nav._tabs;
     return this.nav && tabs && tabs.querySelector(`#${this.tabId || this.defaultTabId}`);
   }
 
@@ -229,7 +229,7 @@ class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElemen
       tab.__isCustomTab = true;
       this.tabId = tab.id;
 
-      this.nav.querySelector('vaadin-tabs').appendChild(tab);
+      this.nav._tabs.appendChild(tab);
 
       this.nav._initTab(tab, this);
       this.nav._sortTabs();
