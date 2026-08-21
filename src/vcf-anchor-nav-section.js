@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
-import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
-import { ThemeDetectionMixin } from '@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin';
+import { ElementMixin } from '@vaadin/component-base/src/element-mixin.js';
+import { ThemeDetectionMixin } from '@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin.js';
 
 /**
  * `<vcf-anchor-nav-section>`
@@ -33,7 +33,7 @@ import { ThemeDetectionMixin } from '@vaadin/vaadin-themable-mixin/vaadin-theme-
  * @mixes ThemeDetectionMixin
  * @demo demo/index.html
  */
-class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElement)) {
+export class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElement)) {
   static get is() {
     return 'vcf-anchor-nav-section';
   }
@@ -256,3 +256,8 @@ class AnchorNavSectionElement extends ThemeDetectionMixin(ElementMixin(LitElemen
 }
 
 customElements.define(AnchorNavSectionElement.is, AnchorNavSectionElement);
+
+/**
+ * @namespace Vaadin
+ */
+window.Vaadin.AnchorNavSectionElement = AnchorNavSectionElement;

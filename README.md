@@ -55,6 +55,37 @@ Add `<vcf-anchor-nav>` element and `<vcf-anchor-nav-section>`s to the page.
 </vcf-anchor-nav>
 ```
 
+### TypeScript
+
+The package ships type declarations next to every module, so the import above needs no
+`// @ts-ignore` and no local `declare module`. Both element classes are exported by name,
+and both tag names are added to `HTMLElementTagNameMap`, so `document.createElement()` and
+`querySelector()` return the typed element:
+
+```ts
+import {
+  AnchorNavElement,
+  AnchorNavSectionElement
+} from '@vaadin-component-factory/vcf-anchor-nav';
+
+const nav = document.querySelector('vcf-anchor-nav')!; // AnchorNavElement
+nav.smoothScroll = true;
+
+// The custom events are typed too.
+nav.addEventListener('selected-changed', event => {
+  console.log(event.detail.id, event.detail.index);
+});
+nav.addEventListener('sections-ready', event => {
+  event.detail.forEach((section: AnchorNavSectionElement) => console.log(section.name));
+});
+
+console.log(AnchorNavElement.is, AnchorNavElement.version);
+```
+
+Every module is also reachable as a subpath import, for example
+`@vaadin-component-factory/vcf-anchor-nav/src/vcf-anchor-nav-section.js`, which is useful
+when only the section element is needed.
+
 ## Running demo
 
 1. Fork the `vcf-anchor-nav` repository and clone it locally.
@@ -64,6 +95,20 @@ Add `<vcf-anchor-nav>` element and `<vcf-anchor-nav-section>`s to the page.
 1. When in the `vcf-anchor-nav` directory, run `npm install` to install dependencies.
 
 1. Run `npm start` to open the demo.
+
+## Releasing
+
+Releases are cut from `master` with a clean working tree:
+
+```sh
+npm run release 4.0.2
+```
+
+The script rewrites `static get version()`, commits, tags via `npm version`, pushes and
+publishes to npm and to GitHub Packages. It refuses to run from a dirty tree, from another
+branch, or when the tag already exists, and it reports which registries already have the
+version if one of them rejects the publish. `npm run lint` fails when the version declared
+in the sources has drifted from `package.json`.
 
 ## Server-side API
 
