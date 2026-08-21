@@ -1,8 +1,8 @@
 import { LitElement, html, css } from 'lit';
-import { ElementMixin } from '@vaadin/component-base/src/element-mixin';
-import { ThemeDetectionMixin } from '@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin';
-import '@vaadin/tabs/vaadin-tabs';
-import '@vaadin/tabs/vaadin-tab';
+import { ElementMixin } from '@vaadin/component-base/src/element-mixin.js';
+import { ThemeDetectionMixin } from '@vaadin/vaadin-themable-mixin/vaadin-theme-detection-mixin.js';
+import '@vaadin/tabs/vaadin-tabs.js';
+import '@vaadin/tabs/vaadin-tab.js';
 
 /**
  * `<vcf-anchor-nav>`

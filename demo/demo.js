@@ -1,10 +1,10 @@
-import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
-import '@polymer/iron-demo-helpers/demo-snippet';
+import '@polymer/iron-demo-helpers/demo-pages-shared-styles.js';
+import '@polymer/iron-demo-helpers/demo-snippet.js';
 import '@vaadin/button';
 import '@vaadin/text-field';
-import '@vaadin/vaadin-lumo-styles/icons';
-import '../vcf-anchor-nav';
-import './demo-icons';
+import '@vaadin/vaadin-lumo-styles/icons.js';
+import '../vcf-anchor-nav.js';
+import './demo-icons.js';
 
 window.addEventListener('WebComponentsReady', () => {
   setTimeout(() => document.querySelector('body').style.removeProperty('overflow'));

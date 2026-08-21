@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { html } from '@polymer/polymer/polymer-element.js';
-import '@vaadin/vaadin-lumo-styles/vaadin-iconset.js'
+import '@vaadin/vaadin-lumo-styles/vaadin-iconset.js';
 
 const template = html`
   <vaadin-iconset name="vcf-demo" size="16">
