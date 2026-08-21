@@ -161,7 +161,7 @@ export class AnchorNavElement extends ThemeDetectionMixin(ElementMixin(LitElemen
   }
 
   static get version() {
-    return '4.0.1';
+    return '4.1.0';
   }
 
   static get properties() {
