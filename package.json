@@ -1,6 +1,6 @@
 {
   "name": "@vaadin-component-factory/vcf-anchor-nav",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "Component with tabs used as anchor navigation and content sections. Automates the linking of tabs and sections.",
   "type": "module",
   "main": "vcf-anchor-nav.js",
